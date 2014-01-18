@@ -17,7 +17,7 @@ public class Character extends GameModel {
 		damage(projectile.getDamage());
 	}
 	
-	private final void damage(int damage) {
+	protected final void damage(int damage) {
 		health -= damage;
 		if (health <= 0 && death != null) death.onDeath(); 
 	}

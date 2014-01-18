@@ -3,6 +3,7 @@ package com.gca.utils;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
+import com.gca.models.Obstacle;
 import com.gca.models.Wizard;
 import com.gca.models.projectiles.LineProjectile;
 
@@ -39,7 +40,11 @@ public class CollisionDetector {
 		return closest.len() <= whb.radius;
 		
 	}
-
+	
+	public static boolean wizardHit (Wizard w, Obstacle o) {
+		return Intersector.overlaps(w.getHitBox(), o.getHitBox());
+	}
+ 
 	public static final boolean orcHit() {
 		return false;
 	}

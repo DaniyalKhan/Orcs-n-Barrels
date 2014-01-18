@@ -1,10 +1,17 @@
 package com.gca.models;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 import com.badlogic.gdx.math.Vector2;
+import com.gca.models.Character.DeathCallback;
+import com.gca.models.projectiles.Arrow;
+import com.gca.models.projectiles.LineProjectile;
 import com.gca.screens.GameScreen;
 import com.gca.utils.KeyHandler.KeyCallback;
+import com.gca.utils.CollisionDetector;
 import com.gca.utils.Timeable;
 
 public class WizardGroup implements KeyCallback, Timeable{
@@ -16,31 +23,57 @@ public class WizardGroup implements KeyCallback, Timeable{
 	private final static int START_LIVES = 4;
 	private final float MOVE_SPEED = 125f/GameScreen.PIX_PER_UNIT;
 	
-	private final Wizard[] wizards;
+	private final List<Wizard> wizards;
 	private final Vector2 moveSpeed;	
 	private int direction;
 
 	private final Random random;
 	
 	public WizardGroup(float midX) {
-		wizards = new Wizard[START_LIVES];
-		int y = 0;
-		for (Wizard wizard: wizards) {
-			wizard = new Wizard(midX - Wizard.SIZE/2f, y, Wizard.SIZE, Wizard.SIZE);
-			y+=Wizard.SIZE;
+		wizards = new LinkedList<Wizard>();
+		float y = (START_LIVES - 1) * Wizard.SIZE;
+		for (int i = 0; i < START_LIVES; i++) {
+			final Wizard wizard = new Wizard(midX - Wizard.SIZE/2f, y, Wizard.SIZE, Wizard.SIZE);
+			wizard.setDeath(new DeathCallback() {
+				@Override
+				public void onDeath() {
+					wizards.remove(wizard);
+				}
+			});
+			y-=Wizard.SIZE;
 		}
 		moveSpeed = new Vector2(MOVE_SPEED, 0);
 		direction = STILL;
 		random = new Random();
 	}
 	
+	public void detectCollision(Arrow arrow) {
+		Iterator<Wizard> wizardIt = wizards.iterator();
+		while (wizardIt.hasNext()) {
+			Wizard wizard = wizardIt.next();
+		    if (CollisionDetector.wizardHit(wizard, arrow)) {
+		    	wizard.onHit(arrow);
+		    }
+		}
+	}
+	
+	public void detectCollision(Obstacle obstacle) {
+		Iterator<Wizard> wizardIt = wizards.iterator();
+		while (wizardIt.hasNext()) {
+			Wizard wizard = wizardIt.next();
+		    if (CollisionDetector.wizardHit(wizard, obstacle)) {
+		    	wizard.onHit(obstacle);
+		    }
+		}
+	}
+	
 	public int size() {
-		return wizards.length;
+		return wizards.size();
 	}
 	
 	public Wizard getRandomWizard() {
 		int index = random.nextInt(size());
-		return wizards[index];
+		return wizards.get(index);
 	}
 	
 	@Override
@@ -56,6 +89,7 @@ public class WizardGroup implements KeyCallback, Timeable{
 		float dy = y != 0 ? y * moveSpeed.y * delta : 0;
 		for (Wizard wizard: wizards) {
 			wizard.move(dx, dy);
+			wizard.addTime(delta);
 		}
 	}
 	
