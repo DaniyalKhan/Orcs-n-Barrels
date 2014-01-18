@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.gca.GCAGame;
 import com.gca.models.Orc;
+import com.gca.models.projectiles.Projectile;
 
 public class GameScreen extends AbstractScreen {
 	
@@ -21,24 +22,25 @@ public class GameScreen extends AbstractScreen {
 	private static final float RIVER_SIZE = 4 * MAIN_SEG_SIZE + 3 * MID_SEG_SIZE;
 	private static final float GRASS_BORDER_SIZE = (VIEWPORT_WIDTH - RIVER_SIZE)/2f;
 	
-	
 	private static final float GRASS_BORDER_LEFT = GRASS_BORDER_SIZE;
 	private static final float GRASS_BORDER_RIGHT = VIEWPORT_WIDTH - GRASS_BORDER_SIZE;
 	
 	private final List<Orc> orcs;
+	private final List<Projectile> arrows;
+	private final List<Projectile> spells;
 	
 	public GameScreen(SpriteBatch batch) {
 		super(batch);
 		this.camera = new OrthographicCamera();
 		this.orcs = new ArrayList<Orc>();
+		this.arrows = new ArrayList<Projectile>();
+		this.spells = new ArrayList<Projectile>();
 	}
-
 	
 	@Override
 	public void addTime(float delta) {
 		super.addTime(delta);
 	}
-
 
 	@Override
 	public void draw(float delta) {

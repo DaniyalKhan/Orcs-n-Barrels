@@ -1,34 +1,32 @@
 package com.gca.models;
 
-import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+
 
 public class GameModel {
 
-	public float x, y;
+	public final Vector2 position;
 	
-	private float width, height;
-	private Rectangle axisBox;
+//	private float width, height;
+//	private Rectangle axisBox;
 	
-	public GameModel(float x, float y, float width, float height) {
+	public GameModel(float x, float y) {
 		super();
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-		this.axisBox = new Rectangle(x, y, width, height); 
+		position = new Vector2(x, y);
+//		this.axisBox = new Rectangle(x, y, width, height); 
 	}
 
-	public Rectangle getAxisBox() {
-		axisBox.x = x;
-		axisBox.y = y;
-		axisBox.width = width;
-		axisBox.height = height;
-		return axisBox;
-	}
+//	public Rectangle getAxisBox() {
+//		axisBox.x = x;
+//		axisBox.y = y;
+//		axisBox.width = width;
+//		axisBox.height = height;
+//		return axisBox;
+//	}
 	
 	public void move(float x, float y) {
-		this.x += x;
-		this.y += y;
+		position.x += x;
+		position.y += y;
 	}
 	
 }
