@@ -5,7 +5,6 @@ import com.gca.models.projectiles.Projectile;
 
 public class Character extends GameModel {
 
-	protected DeathCallback death;
 	protected int health;
 	
 	public Character(float x, float y, int health) {
@@ -13,22 +12,14 @@ public class Character extends GameModel {
 		this.health = health;
 	}
 	
-	public void onHit(Projectile projectile) {
-		damage(projectile.getDamage());
+	public boolean onHit(Projectile projectile) {
+		return damage(projectile.getDamage());
 	}
 	
-	protected final void damage(int damage) {
+	protected final boolean damage(int damage) {
 		health -= damage;
-		if (health <= 0 && death != null) death.onDeath(); 
+		if (health <= 0) return true;
+		return false;
 	}
-
-	public final void setDeath(DeathCallback death) {
-		this.death = death;
-	}
-	
-	public interface DeathCallback {
-		void onDeath();
-	}
-	
 	
 }

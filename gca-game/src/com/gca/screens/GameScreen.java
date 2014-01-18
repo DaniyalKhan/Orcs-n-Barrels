@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.gca.GCAGame;
-import com.gca.models.Character.DeathCallback;
 import com.gca.models.Obstacle;
 import com.gca.models.Orc;
 import com.gca.models.Wizard;
@@ -55,6 +54,9 @@ public class GameScreen extends AbstractScreen {
 	
 	@Override
 	public void addTime(float delta) {
+
+//		wizards.print();
+		
 		super.addTime(delta);
 		
 		wizards.addTime(delta);
@@ -105,13 +107,6 @@ public class GameScreen extends AbstractScreen {
 	private void spawnOrc() {
 		float x = random.nextDouble() < 0.5 ? -1f : VIEWPORT_WIDTH + 1f;
 		float y = random.nextFloat() * camera.viewportHeight;
-		final Orc o = new Orc(x, y);
-		o.setDeath(new DeathCallback() {
-			@Override
-			public void onDeath() {
-				orcs.remove(o);
-			}
-		});
 		orcs.add(new Orc(x, y));
 	}
 	

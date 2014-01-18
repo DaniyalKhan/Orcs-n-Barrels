@@ -33,16 +33,16 @@ public class Wizard extends Character implements Timeable {
 	}
 	
 	@Override
-	public void onHit(Projectile projectile) {
-		if (hurt) return;
+	public boolean onHit(Projectile projectile) {
+		if (hurt) return false;
 		startHurtTimer();
-		super.onHit(projectile);
+		return super.onHit(projectile);
 	}
 
-	public void onHit(Obstacle obstacle) {
-		if (hurt) return;
+	public boolean onHit(Obstacle obstacle) {
+		if (hurt) return false;
 		startHurtTimer();
-		damage(obstacle.getDamage());
+		return damage(obstacle.getDamage());
 	}
 	
 	private void startHurtTimer() {

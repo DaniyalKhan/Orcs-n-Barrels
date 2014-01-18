@@ -5,13 +5,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import com.gca.models.Character.DeathCallback;
 import com.gca.models.projectiles.Arrow;
-import com.gca.models.projectiles.LineProjectile;
 import com.gca.screens.GameScreen;
-import com.gca.utils.KeyHandler.KeyCallback;
 import com.gca.utils.CollisionDetector;
+import com.gca.utils.KeyHandler.KeyCallback;
 import com.gca.utils.Timeable;
 
 public class WizardGroup implements KeyCallback, Timeable{
@@ -34,12 +33,7 @@ public class WizardGroup implements KeyCallback, Timeable{
 		float y = (START_LIVES - 1) * Wizard.SIZE;
 		for (int i = 0; i < START_LIVES; i++) {
 			final Wizard wizard = new Wizard(midX - Wizard.SIZE/2f, y, Wizard.SIZE, Wizard.SIZE);
-			wizard.setDeath(new DeathCallback() {
-				@Override
-				public void onDeath() {
-					wizards.remove(wizard);
-				}
-			});
+			wizards.add(wizard);
 			y-=Wizard.SIZE;
 		}
 		moveSpeed = new Vector2(MOVE_SPEED, 0);
@@ -52,7 +46,7 @@ public class WizardGroup implements KeyCallback, Timeable{
 		while (wizardIt.hasNext()) {
 			Wizard wizard = wizardIt.next();
 		    if (CollisionDetector.wizardHit(wizard, arrow)) {
-		    	wizard.onHit(arrow);
+		    	if (wizard.onHit(arrow)) wizardIt.remove();
 		    }
 		}
 	}
@@ -62,7 +56,7 @@ public class WizardGroup implements KeyCallback, Timeable{
 		while (wizardIt.hasNext()) {
 			Wizard wizard = wizardIt.next();
 		    if (CollisionDetector.wizardHit(wizard, obstacle)) {
-		    	wizard.onHit(obstacle);
+		    	if (wizard.onHit(obstacle)) wizardIt.remove();
 		    }
 		}
 	}
@@ -72,7 +66,16 @@ public class WizardGroup implements KeyCallback, Timeable{
 	}
 	
 	public Wizard getRandomWizard() {
+		
+		Gdx.app.log("# remaining ",  Integer.toString(size()));
+		
+		for (int i = 0; i < wizards.size(); i++) {
+			Gdx.app.log("wizard " + i + " has hp: ",  Integer.toString(wizards.get(i).health));
+		}
+		
+//		Gdx.app.log("# remaining ",  Integer.toString(size()));
 		int index = random.nextInt(size());
+		Gdx.app.log("selecting wizard ",  Integer.toString(index));
 		return wizards.get(index);
 	}
 	
@@ -111,6 +114,17 @@ public class WizardGroup implements KeyCallback, Timeable{
 	@Override
 	public void onRightUp() {
 		direction = STILL;
+	}
+
+	public void print() {
+		
+		Gdx.app.log("# remaining ",  Integer.toString(size()));
+		
+		for (int i = 0; i < wizards.size(); i++) {
+			Gdx.app.log("wizard " + i + " has hp: ",  Integer.toString(wizards.get(i).health));
+		}
+		
+		
 	}
 		
 }

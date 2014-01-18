@@ -26,7 +26,7 @@ public class GCAGame extends Game {
 
 	@Override
 	public void render() {
-		
+		super.render();
 	}
 
 	@Override
