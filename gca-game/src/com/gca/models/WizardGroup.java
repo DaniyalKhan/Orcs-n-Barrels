@@ -15,16 +15,16 @@ import com.gca.utils.Timeable;
 
 public class WizardGroup implements KeyCallback, Timeable{
 
-	private final int STILL = 0x000;
-	private final int LEFT = 0x001;
-	private final int RIGHT = 0x002;
+	public final int STILL = 0x000;
+	public final int LEFT = 0x001;
+	public final int RIGHT = 0x002;
 	
 	private final static int START_LIVES = 4;
 	private final float MOVE_SPEED = 175f/GameScreen.PIX_PER_UNIT;
 	
 	private final List<Wizard> wizards;
 	private final Vector2 moveSpeed;	
-	private int direction;
+	public int direction;
 
 	private final Random random;
 	

@@ -7,7 +7,6 @@ import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -75,9 +74,17 @@ public class GameScreen extends AbstractScreen {
 			orc.addTime(delta);
 			if (orc.shootArrow()) {
 				Wizard target = wizards.getRandomWizard();
-//				float distY = orc.position.y - target.position.y;		
-//				float distX = orc.position.x - target.position.x;
-//				float angle;
+				float distance = orc.position.dst(target.position);		
+				float distX = Math.abs(orc.position.x - target.position.x);
+				float angle = (float) Math.acos(distX/distance);
+				if (orc.position.x < target.position.x && orc.position.y > target.position.y) {
+					angle = MathUtils.PI + angle;
+				} else if (orc.position.x > target.position.x && orc.position.y < target.position.y) {
+					angle += MathUtils.PI/2f;
+				} else if (orc.position.x > target.position.x && orc.position.y > target.position.y) {
+					angle = MathUtils.PI + angle;
+				}
+				orc.angle = angle;
 //				if (orc.position.y < target.position.y) angle = (float) Math.acos(distX/distance);
 //				else  angle = (float) Math.asin(distX/distance);
 //				arrows.add(new Arrow(orc.position.x, orc.position.y, 0));
@@ -113,7 +120,7 @@ public class GameScreen extends AbstractScreen {
 		batch.begin();
 		renderer.setSpriteBatch(batch);
 		renderer.water();
-		renderer.bubble(delta);
+		renderer.bubble(delta, wizards);
 		renderer.grass();
 		renderer.cliff(delta);
 		renderer.wizards(wizards);

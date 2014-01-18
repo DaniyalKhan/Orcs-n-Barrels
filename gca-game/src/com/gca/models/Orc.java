@@ -23,6 +23,8 @@ public class Orc extends Character implements Timeable {
 	private float shootTimer;
 	
 	public float animTime;
+	public float angle;
+	public boolean shooting;
 	
 	public Orc(float x, float y) {
 		super(x, y, HEALTH);
@@ -45,7 +47,9 @@ public class Orc extends Character implements Timeable {
 	public boolean shootArrow() {
 		if (timeSinceShoot >= shootTimer && destination.y == position.y) {
 			timeSinceShoot = 0f;
-			shootTimer = (RAND.nextFloat() * 2) +1;
+			shootTimer = (RAND.nextFloat() * 2) + 1;
+			shooting = true;
+			animTime = 0f;
 			return true;
 		}
 		return false;
