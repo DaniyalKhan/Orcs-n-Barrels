@@ -7,7 +7,9 @@ import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.gca.GCAGame;
 import com.gca.models.Obstacle;
@@ -22,8 +24,6 @@ public class GameScreen extends AbstractScreen {
 	private static final float VIEWPORT_WIDTH = 6f;
 	public static final float PIX_PER_UNIT = GCAGame.TARGET_RES_PIX/VIEWPORT_WIDTH;
 	
-	private final OrthographicCamera camera;
-	
 	private static final float MAIN_SEG_SIZE = 100f/PIX_PER_UNIT;
 	private static final float MID_SEG_SIZE = 25f/PIX_PER_UNIT;
 	private static final float RIVER_SIZE = 4 * MAIN_SEG_SIZE + 3 * MID_SEG_SIZE;
@@ -32,7 +32,7 @@ public class GameScreen extends AbstractScreen {
 	private static final float GRASS_BORDER_LEFT = GRASS_BORDER_SIZE;
 	private static final float GRASS_BORDER_RIGHT = VIEWPORT_WIDTH - GRASS_BORDER_SIZE;
 	
-	private static final float ORC_RESPAWN_TIMER = 2f;
+	private final OrthographicCamera camera;
 	
 	private final List<Orc> orcs;
 	private final List<Arrow> arrows;
@@ -40,7 +40,10 @@ public class GameScreen extends AbstractScreen {
 	private final WizardGroup wizards;
 	
 	private float timeSinceOrcSpawn = 0;
+	private float orcSpawnTime;
 	private final Random random;
+	
+	private Renderer renderer;
 	
 	public GameScreen(SpriteBatch batch) {
 		super(batch);
@@ -50,6 +53,7 @@ public class GameScreen extends AbstractScreen {
 		this.obstacles = new LinkedList<Obstacle>();
 		this.wizards = new WizardGroup(VIEWPORT_WIDTH/2f);
 		this.random = new Random(); 
+		this.orcSpawnTime = 2f; 
 	}
 	
 	@Override
@@ -61,8 +65,9 @@ public class GameScreen extends AbstractScreen {
 		
 		wizards.addTime(delta);
 		
-		if (timeSinceOrcSpawn >= ORC_RESPAWN_TIMER) {
+		if (timeSinceOrcSpawn >= orcSpawnTime) {
 			timeSinceOrcSpawn = 0;
+			orcSpawnTime = random.nextFloat() * 2 + 1;
 			spawnOrc();
 		} else timeSinceOrcSpawn += delta;
 		
@@ -70,9 +75,12 @@ public class GameScreen extends AbstractScreen {
 			orc.addTime(delta);
 			if (orc.shootArrow()) {
 				Wizard target = wizards.getRandomWizard();
-				float distX = target.position.x - orc.position.x;
-				float distY = target.position.y - orc.position.y;
-				arrows.add(new Arrow(orc.position.x, orc.position.y, (float) Math.atan(distX/distY)));
+//				float distY = orc.position.y - target.position.y;		
+//				float distX = orc.position.x - target.position.x;
+//				float angle;
+//				if (orc.position.y < target.position.y) angle = (float) Math.acos(distX/distance);
+//				else  angle = (float) Math.asin(distX/distance);
+//				arrows.add(new Arrow(orc.position.x, orc.position.y, 0));
 			}
 		}
 		
@@ -82,7 +90,7 @@ public class GameScreen extends AbstractScreen {
 		    if (notInBounds(arrow.position)) arrowIt.remove();
 		    else {
 		    	arrow.addTime(delta);
-		    	wizards.detectCollision(arrow);
+		    	if (wizards.detectCollision(arrow)) arrowIt.remove();
 		    }
 		}
 		
@@ -92,7 +100,7 @@ public class GameScreen extends AbstractScreen {
 		    if (notInBounds(obstacle.position)) obstacleIt.remove();
 		    else {
 		    	obstacle.addTime(delta);
-		    	wizards.detectCollision(obstacle);
+		    	if (wizards.detectCollision(obstacle)) obstacleIt.remove();
 		    }
 		}
 		
@@ -102,12 +110,24 @@ public class GameScreen extends AbstractScreen {
 	public void draw(float delta) {
 		super.draw(delta);
 		batch.setProjectionMatrix(camera.combined);
+		batch.begin();
+		renderer.setSpriteBatch(batch);
+		renderer.water();
+		renderer.bubble(delta);
+		renderer.grass();
+		renderer.cliff(delta);
+		renderer.wizards(wizards);
+		renderer.orcs(orcs);
+		renderer.arrows(arrows);
+		batch.end();
 	}
 	
 	private void spawnOrc() {
-		float x = random.nextDouble() < 0.5 ? -1f : VIEWPORT_WIDTH + 1f;
-		float y = random.nextFloat() * camera.viewportHeight;
-		orcs.add(new Orc(x, y));
+		float x = random.nextDouble() < 0.5 ? 0 : VIEWPORT_WIDTH - 100f/GameScreen.PIX_PER_UNIT;
+		float y = -1f;
+		Orc newOrc = new Orc(x, y);
+		newOrc.setDestination(newOrc.position.x, random.nextFloat() * camera.viewportHeight * 0.8f);
+		orcs.add(newOrc);
 	}
 	
 	private boolean notInBounds(Vector2 v) {
@@ -118,6 +138,7 @@ public class GameScreen extends AbstractScreen {
 	public void show() {
 		float aspectRatio = ((float)Gdx.graphics.getHeight())/Gdx.graphics.getWidth();
 		camera.setToOrtho(false, VIEWPORT_WIDTH, aspectRatio * VIEWPORT_WIDTH);
+		renderer = new Renderer(VIEWPORT_WIDTH, camera.viewportHeight);
 		Gdx.input.setInputProcessor(new KeyHandler(wizards));
 	}
 

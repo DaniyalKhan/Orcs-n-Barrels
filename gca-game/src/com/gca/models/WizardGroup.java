@@ -20,7 +20,7 @@ public class WizardGroup implements KeyCallback, Timeable{
 	private final int RIGHT = 0x002;
 	
 	private final static int START_LIVES = 4;
-	private final float MOVE_SPEED = 125f/GameScreen.PIX_PER_UNIT;
+	private final float MOVE_SPEED = 175f/GameScreen.PIX_PER_UNIT;
 	
 	private final List<Wizard> wizards;
 	private final Vector2 moveSpeed;	
@@ -41,24 +41,32 @@ public class WizardGroup implements KeyCallback, Timeable{
 		random = new Random();
 	}
 	
-	public void detectCollision(Arrow arrow) {
+	public List<Wizard> getWizards() {
+		return wizards;
+	}
+	
+	public boolean detectCollision(Arrow arrow) {
 		Iterator<Wizard> wizardIt = wizards.iterator();
 		while (wizardIt.hasNext()) {
 			Wizard wizard = wizardIt.next();
 		    if (CollisionDetector.wizardHit(wizard, arrow)) {
 		    	if (wizard.onHit(arrow)) wizardIt.remove();
+		    	return true;
 		    }
 		}
+		return false;
 	}
 	
-	public void detectCollision(Obstacle obstacle) {
+	public boolean detectCollision(Obstacle obstacle) {
 		Iterator<Wizard> wizardIt = wizards.iterator();
 		while (wizardIt.hasNext()) {
 			Wizard wizard = wizardIt.next();
 		    if (CollisionDetector.wizardHit(wizard, obstacle)) {
 		    	if (wizard.onHit(obstacle)) wizardIt.remove();
+		    	return true;
 		    }
 		}
+		return false;
 	}
 	
 	public int size() {
@@ -67,15 +75,15 @@ public class WizardGroup implements KeyCallback, Timeable{
 	
 	public Wizard getRandomWizard() {
 		
-		Gdx.app.log("# remaining ",  Integer.toString(size()));
-		
-		for (int i = 0; i < wizards.size(); i++) {
-			Gdx.app.log("wizard " + i + " has hp: ",  Integer.toString(wizards.get(i).health));
-		}
+//		Gdx.app.log("# remaining ",  Integer.toString(size()));
+//		
+//		for (int i = 0; i < wizards.size(); i++) {
+//			Gdx.app.log("wizard " + i + " has hp: ",  Integer.toString(wizards.get(i).health));
+//		}
 		
 //		Gdx.app.log("# remaining ",  Integer.toString(size()));
 		int index = random.nextInt(size());
-		Gdx.app.log("selecting wizard ",  Integer.toString(index));
+//		Gdx.app.log("selecting wizard ",  Integer.toString(index));
 		return wizards.get(index);
 	}
 	
