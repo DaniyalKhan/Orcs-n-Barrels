@@ -1,0 +1,109 @@
+main.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+barrel
+  rotate: false
+  xy: 342, 104
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+ orcshoot
+  rotate: false
+  xy: 187, 226
+  size: 76, 110
+  orig: 150, 150
+  offset: 37, 33
+  index: 1
+orcshoot
+  rotate: false
+  xy: 186, 114
+  size: 76, 110
+  orig: 150, 150
+  offset: 37, 33
+  index: 4
+orcshoot
+  rotate: false
+  xy: 264, 114
+  size: 76, 110
+  orig: 150, 150
+  offset: 38, 33
+  index: 3
+bubbles side
+  rotate: false
+  xy: 2, 237
+  size: 62, 200
+  orig: 100, 200
+  offset: 38, 0
+  index: -1
+trail fwd
+  rotate: false
+  xy: 66, 237
+  size: 119, 191
+  orig: 119, 191
+  offset: 0, 0
+  index: -1
+wizard
+  rotate: true
+  xy: 104, 430
+  size: 80, 88
+  orig: 100, 100
+  offset: 11, 0
+  index: -1
+water
+  rotate: false
+  xy: 266, 2
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+grass
+  rotate: false
+  xy: 265, 226
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+orcshoot
+  rotate: false
+  xy: 186, 2
+  size: 78, 110
+  orig: 150, 150
+  offset: 35, 33
+  index: 2
+orcwalk
+  rotate: true
+  xy: 187, 338
+  size: 88, 84
+  orig: 150, 150
+  offset: 25, 24
+  index: -1
+arrow
+  rotate: true
+  xy: 2, 463
+  size: 19, 74
+  orig: 55, 94
+  offset: 15, 8
+  index: -1
+orcwalk
+  rotate: true
+  xy: 368, 2
+  size: 88, 84
+  orig: 150, 150
+  offset: 27, 24
+  index: -1
+bubbles move side
+  rotate: false
+  xy: 2, 2
+  size: 182, 233
+  orig: 182, 233
+  offset: 0, 0
+  index: -1
+cliff tile
+  rotate: true
+  xy: 2, 439
+  size: 22, 100
+  orig: 22, 100
+  offset: 0, 0
+  index: -1

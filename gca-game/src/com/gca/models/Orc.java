@@ -12,6 +12,7 @@ import com.gca.utils.Timeable;
 public class Orc extends Character implements Timeable {
 	
 	private static final int HEALTH = 3;
+	private static final int ARROW_DAMAGE = 1;
 	public static final float ORC_WIDTH = 75/GameScreen.PIX_PER_UNIT;
 	public static final float ORC_HEIGHT = 75/GameScreen.PIX_PER_UNIT;
 	private static final float MOVE_SPEED = 125f/GameScreen.PIX_PER_UNIT;
@@ -68,7 +69,26 @@ public class Orc extends Character implements Timeable {
 				shootTimer = 1f;
 			}
 		} 
+	}
+	
+	public int getDamage() {
+		return ARROW_DAMAGE;
+	}
+	
+	public static class EliteOrc extends Orc {
 
+		public static final int ARROW_DAMAGE = 2;
+		public static final float HEALTH = 5;
+		private static final float MOVE_SPEED = 175f/GameScreen.PIX_PER_UNIT;
+		
+		public EliteOrc(float x, float y) {
+			super(x, y);
+		}
+		
+		public int getDamage() {
+			return ARROW_DAMAGE;
+		}
+		
 	}
 	
 }

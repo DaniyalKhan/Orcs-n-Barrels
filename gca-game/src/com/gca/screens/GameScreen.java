@@ -16,6 +16,7 @@ import com.gca.models.Orc;
 import com.gca.models.Wizard;
 import com.gca.models.WizardGroup;
 import com.gca.models.projectiles.Arrow;
+import com.gca.models.projectiles.Spell;
 import com.gca.utils.KeyHandler;
 
 public class GameScreen extends AbstractScreen {
@@ -28,13 +29,14 @@ public class GameScreen extends AbstractScreen {
 	private static final float RIVER_SIZE = 4 * MAIN_SEG_SIZE + 3 * MID_SEG_SIZE;
 	private static final float GRASS_BORDER_SIZE = (VIEWPORT_WIDTH - RIVER_SIZE)/2f;
 	
-	private static final float GRASS_BORDER_LEFT = GRASS_BORDER_SIZE;
-	private static final float GRASS_BORDER_RIGHT = VIEWPORT_WIDTH - GRASS_BORDER_SIZE;
+	public static final float GRASS_BORDER_LEFT = GRASS_BORDER_SIZE - 11f/PIX_PER_UNIT;
+	public static final float GRASS_BORDER_RIGHT = VIEWPORT_WIDTH - GRASS_BORDER_SIZE + 11f/PIX_PER_UNIT;;
 	
 	private final OrthographicCamera camera;
 	
 	private final List<Orc> orcs;
 	private final List<Arrow> arrows;
+	private final List<Spell> spells;
 	private final List<Obstacle> obstacles;
 	private final WizardGroup wizards;
 	
@@ -49,8 +51,14 @@ public class GameScreen extends AbstractScreen {
 		this.camera = new OrthographicCamera();
 		this.orcs = new LinkedList<Orc>();
 		this.arrows = new LinkedList<Arrow>();
+		this.spells = new LinkedList<Spell>();
 		this.obstacles = new LinkedList<Obstacle>();
-		this.wizards = new WizardGroup(VIEWPORT_WIDTH/2f);
+		this.wizards = new WizardGroup(VIEWPORT_WIDTH/2f, new WizardGroup.SpellCallback() {
+			@Override
+			public void useSpell(float x, float y) {
+				wizards.cast(x, y, spells);
+			}
+		});
 		this.random = new Random(); 
 		this.orcSpawnTime = 2f; 
 	}
@@ -77,22 +85,19 @@ public class GameScreen extends AbstractScreen {
 				float distance = orc.position.dst(target.position);		
 				float distX = Math.abs(orc.position.x - target.position.x);
 				float angle = (float) Math.acos(distX/distance);
-				int dirX = 1;
-				int dirY = 1;
 				if (orc.position.x < target.position.x && orc.position.y > target.position.y) {
 					angle = MathUtils.PI2 - angle;
-					dirY = -1;
 				} else if (orc.position.x > target.position.x && orc.position.y < target.position.y) {
 					angle = MathUtils.PI - angle;
-					dirX = -1;
 				} else if (orc.position.x > target.position.x && orc.position.y > target.position.y) {
 					angle = MathUtils.PI + angle;
-					dirX = -1;
-					dirY = -1;
 				}
 				orc.angle = angle;
 				Vector2 arrowVelocity = new Vector2(Arrow.VELOCITY * MathUtils.cos(angle), Arrow.VELOCITY * MathUtils.sin(angle));
-				Arrow a = new Arrow(orc.position.x + Orc.ORC_WIDTH/2f - Arrow.ARROW_WIDTH/2f, orc.position.y + Orc.ORC_HEIGHT/2f - Arrow.ARROW_HEIGHT/2f, arrowVelocity, angle);
+				float posX =  orc.position.x + Orc.ORC_WIDTH/2f - Arrow.ARROW_WIDTH/2f;
+				if (posX > VIEWPORT_WIDTH) posX = VIEWPORT_WIDTH;
+				if (posX < 0) posX = 0;
+				Arrow a = new Arrow(posX, orc.position.y + Orc.ORC_HEIGHT/2f - Arrow.ARROW_HEIGHT/2f + 0.15f, arrowVelocity, angle, orc.getDamage());
 				arrows.add(a);
 			}
 		}
@@ -117,6 +122,16 @@ public class GameScreen extends AbstractScreen {
 		    }
 		}
 		
+		Iterator<Spell> spellIt = spells.iterator();
+		while (spellIt.hasNext()) {
+			Spell spell = spellIt.next();
+		    if (notInBounds(spell.position)) spellIt.remove();
+		    else {
+		    	spell.addTime(delta);
+//		    	if (wizards.detectCollision(obstacle)) obstacleIt.remove();
+		    }
+		}
+		
 	}
 
 	@Override
@@ -132,14 +147,16 @@ public class GameScreen extends AbstractScreen {
 		renderer.wizards(wizards);
 		renderer.orcs(orcs);
 		renderer.arrows(arrows);
+		renderer.spells(spells);
 		batch.end();
 	}
 	
 	private void spawnOrc() {
-//		float x = VIEWPORT_WIDTH - 100f/GameScreen.PIX_PER_UNIT;
 		float x = random.nextDouble() < 0.5 ? 0 : VIEWPORT_WIDTH - 100f/GameScreen.PIX_PER_UNIT;
 		float y = -1f;
-		Orc newOrc = new Orc(x, y);
+		Orc newOrc;
+		if (random.nextDouble() < 0.1f) newOrc = new Orc.EliteOrc(x, y);
+		else newOrc = new Orc(x, y);
 		newOrc.setDestination(newOrc.position.x, random.nextFloat() * camera.viewportHeight * 0.8f);
 		orcs.add(newOrc);
 	}
@@ -153,9 +170,9 @@ public class GameScreen extends AbstractScreen {
 		float aspectRatio = ((float)Gdx.graphics.getHeight())/Gdx.graphics.getWidth();
 		camera.setToOrtho(false, VIEWPORT_WIDTH, aspectRatio * VIEWPORT_WIDTH);
 		renderer = new Renderer(VIEWPORT_WIDTH, camera.viewportHeight);
-		Gdx.input.setInputProcessor(new KeyHandler(wizards));
+		Gdx.input.setInputProcessor(new KeyHandler(wizards, camera.viewportHeight));
 	}
-
+	
 	@Override
 	public void hide() {
 		// TODO Auto-generated method stub

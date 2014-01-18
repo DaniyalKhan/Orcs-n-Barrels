@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.gca.models.projectiles.Arrow;
+import com.gca.models.projectiles.Spell;
 import com.gca.screens.GameScreen;
 import com.gca.utils.CollisionDetector;
 import com.gca.utils.KeyHandler.KeyCallback;
@@ -15,30 +17,33 @@ import com.gca.utils.Timeable;
 
 public class WizardGroup implements KeyCallback, Timeable{
 
-	public final int STILL = 0x000;
-	public final int LEFT = 0x001;
-	public final int RIGHT = 0x002;
 	
 	private final static int START_LIVES = 4;
-	private final float MOVE_SPEED = 175f/GameScreen.PIX_PER_UNIT;
+	private final float MOVE_SPEED = 225f/GameScreen.PIX_PER_UNIT;
 	
 	private final List<Wizard> wizards;
 	private final Vector2 moveSpeed;	
-	public int direction;
 
+	float lastResponseTimeStamp;
+	
 	private final Random random;
 	
-	public WizardGroup(float midX) {
+	int direction;
+	
+	SpellCallback callback;
+	
+	public WizardGroup(float midX, SpellCallback callback) {
 		wizards = new LinkedList<Wizard>();
 		float y = (START_LIVES - 1) * Wizard.SIZE;
 		for (int i = 0; i < START_LIVES; i++) {
-			final Wizard wizard = new Wizard(midX - Wizard.SIZE/2f, y, Wizard.SIZE, Wizard.SIZE);
+			final Wizard wizard = new Wizard(midX - Wizard.SIZE/2f + (i % 2) * 0.3f -0.15f, y, Wizard.SIZE, Wizard.SIZE, i*0.05f);
 			wizards.add(wizard);
 			y-=Wizard.SIZE;
 		}
 		moveSpeed = new Vector2(MOVE_SPEED, 0);
-		direction = STILL;
 		random = new Random();
+		lastResponseTimeStamp = 0;
+		this.callback = callback;
 	}
 	
 	public List<Wizard> getWizards() {
@@ -49,9 +54,10 @@ public class WizardGroup implements KeyCallback, Timeable{
 		Iterator<Wizard> wizardIt = wizards.iterator();
 		while (wizardIt.hasNext()) {
 			Wizard wizard = wizardIt.next();
+			boolean hurt = wizard.hurt;
 		    if (CollisionDetector.wizardHit(wizard, arrow)) {
 		    	if (wizard.onHit(arrow)) wizardIt.remove();
-		    	return true;
+		    	return (!hurt && wizard.hurt);
 		    }
 		}
 		return false;
@@ -61,9 +67,10 @@ public class WizardGroup implements KeyCallback, Timeable{
 		Iterator<Wizard> wizardIt = wizards.iterator();
 		while (wizardIt.hasNext()) {
 			Wizard wizard = wizardIt.next();
+			boolean hurt = wizard.hurt;
 		    if (CollisionDetector.wizardHit(wizard, obstacle)) {
 		    	if (wizard.onHit(obstacle)) wizardIt.remove();
-		    	return true;
+		    	return (!hurt && wizard.hurt);
 		    }
 		}
 		return false;
@@ -74,54 +81,51 @@ public class WizardGroup implements KeyCallback, Timeable{
 	}
 	
 	public Wizard getRandomWizard() {
-		
-//		Gdx.app.log("# remaining ",  Integer.toString(size()));
-//		
-//		for (int i = 0; i < wizards.size(); i++) {
-//			Gdx.app.log("wizard " + i + " has hp: ",  Integer.toString(wizards.get(i).health));
-//		}
-		
-//		Gdx.app.log("# remaining ",  Integer.toString(size()));
 		int index = random.nextInt(size());
-//		Gdx.app.log("selecting wizard ",  Integer.toString(index));
 		return wizards.get(index);
 	}
 	
 	@Override
 	public void addTime(float delta) {
-		int x = 0;
-		if (direction == LEFT) x = -1;
-		if (direction == RIGHT) x = 1;
-		moveWizards(x, 0, delta);
-	}
-	
-	private final void moveWizards(int x, int y, float delta) {
-		float dx = x != 0 ? x * moveSpeed.x * delta : 0;
-		float dy = y != 0 ? y * moveSpeed.y * delta : 0;
+		int i = -1;
+		lastResponseTimeStamp +=delta;
 		for (Wizard wizard: wizards) {
-			wizard.move(dx, dy);
+			i++;
+			if (wizard.responseThreshold <= lastResponseTimeStamp) {
+				wizard.direction = direction;
+			}
+			int x = 0;
+			if (wizard.direction == Wizard.LEFT) x = -1;
+			if (wizard.direction == Wizard.RIGHT) x = 1;
+			wizard.move(x * moveSpeed.x * delta, 0);
 			wizard.addTime(delta);
+			if (wizard.position.x < GameScreen.GRASS_BORDER_LEFT) wizard.position.x = GameScreen.GRASS_BORDER_LEFT;
+			else if (wizard.position.x + Wizard.SIZE > GameScreen.GRASS_BORDER_RIGHT) wizard.position.x = GameScreen.GRASS_BORDER_RIGHT - Wizard.SIZE;
 		}
 	}
 	
 	@Override
 	public void onLeftDown() {
-		direction = LEFT;
+		direction = Wizard.LEFT;
+		lastResponseTimeStamp = 0;
 	}
 
 	@Override
 	public void onLeftUp() {
-		direction = STILL;
+		direction = Wizard.STILL;
+		lastResponseTimeStamp = 0;
 	}
 
 	@Override
 	public void onRightDown() {
-		direction = RIGHT;
+		direction = Wizard.RIGHT;
+		lastResponseTimeStamp = 0;
 	}
 
 	@Override
 	public void onRightUp() {
-		direction = STILL;
+		direction = Wizard.STILL;
+		lastResponseTimeStamp = 0;
 	}
 
 	public void print() {
@@ -132,7 +136,28 @@ public class WizardGroup implements KeyCallback, Timeable{
 			Gdx.app.log("wizard " + i + " has hp: ",  Integer.toString(wizards.get(i).health));
 		}
 		
-		
+	}
+
+	@Override
+	public void onTouch(float x, float y) {
+		callback.useSpell(x, y);
 	}
 		
+	public interface SpellCallback {
+		void useSpell(float x, float y);
+	}
+	
+	public void cast(float targetX, float targetY, List<Spell> addTo) {
+		
+		for (Wizard wizard: wizards) {
+			float distance = wizard.position.dst(targetX, targetY);		
+			float distX = targetX - wizard.position.x;
+			float angle = (float) Math.acos(distX/distance);
+			Vector2 spellVelocity = new Vector2(MathUtils.cos(angle) * Spell.VELOCITY, MathUtils.sin(angle) * Spell.VELOCITY);
+			if (targetY - wizard.position.y < 0) spellVelocity.scl(1f, -1f);
+			if (distX < 0) spellVelocity.scl(-1f, 1f);
+			addTo.add(new Spell(wizard.position.x + Wizard.SIZE/2f, wizard.position.y + Wizard.SIZE/2f, Spell.LENGTH, spellVelocity, angle, 1));
+		}
+	}
+	
 }

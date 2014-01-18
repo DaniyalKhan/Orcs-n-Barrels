@@ -5,16 +5,15 @@ import com.gca.screens.GameScreen;
 
 public class Arrow extends LineProjectile {
 	
-	public static final float LENGTH = 94f/GameScreen.PIX_PER_UNIT;
+	public static final float LENGTH = 74f/GameScreen.PIX_PER_UNIT;
 	public static final float ARROW_HEIGHT = 55f/GameScreen.PIX_PER_UNIT;
 	public static final float ARROW_WIDTH = 94f/GameScreen.PIX_PER_UNIT;
-	private static final int ARROW_DAMAGE = 1;
-	public static final float VELOCITY = 150f/GameScreen.PIX_PER_UNIT;
+	public static final float VELOCITY = 700f/GameScreen.PIX_PER_UNIT;
 	
 	public float angle;
 	
-	public Arrow(float x, float y, Vector2 velocity, float angle) {
-		super(x, y, LENGTH, velocity, angle, ARROW_DAMAGE);
+	public Arrow(float x, float y, Vector2 velocity, float angle, int damage) {
+		super(x, y, LENGTH, velocity, angle, damage);
 		this.angle = angle;
 	}
 
