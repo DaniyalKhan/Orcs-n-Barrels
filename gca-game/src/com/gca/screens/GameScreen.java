@@ -77,17 +77,23 @@ public class GameScreen extends AbstractScreen {
 				float distance = orc.position.dst(target.position);		
 				float distX = Math.abs(orc.position.x - target.position.x);
 				float angle = (float) Math.acos(distX/distance);
+				int dirX = 1;
+				int dirY = 1;
 				if (orc.position.x < target.position.x && orc.position.y > target.position.y) {
-					angle = MathUtils.PI + angle;
+					angle = MathUtils.PI2 - angle;
+					dirY = -1;
 				} else if (orc.position.x > target.position.x && orc.position.y < target.position.y) {
-					angle += MathUtils.PI/2f;
+					angle = MathUtils.PI - angle;
+					dirX = -1;
 				} else if (orc.position.x > target.position.x && orc.position.y > target.position.y) {
 					angle = MathUtils.PI + angle;
+					dirX = -1;
+					dirY = -1;
 				}
 				orc.angle = angle;
-//				if (orc.position.y < target.position.y) angle = (float) Math.acos(distX/distance);
-//				else  angle = (float) Math.asin(distX/distance);
-//				arrows.add(new Arrow(orc.position.x, orc.position.y, 0));
+				Vector2 arrowVelocity = new Vector2(Arrow.VELOCITY * MathUtils.cos(angle), Arrow.VELOCITY * MathUtils.sin(angle));
+				Arrow a = new Arrow(orc.position.x + Orc.ORC_WIDTH/2f - Arrow.ARROW_WIDTH/2f, orc.position.y + Orc.ORC_HEIGHT/2f - Arrow.ARROW_HEIGHT/2f, arrowVelocity, angle);
+				arrows.add(a);
 			}
 		}
 		
@@ -130,6 +136,7 @@ public class GameScreen extends AbstractScreen {
 	}
 	
 	private void spawnOrc() {
+//		float x = VIEWPORT_WIDTH - 100f/GameScreen.PIX_PER_UNIT;
 		float x = random.nextDouble() < 0.5 ? 0 : VIEWPORT_WIDTH - 100f/GameScreen.PIX_PER_UNIT;
 		float y = -1f;
 		Orc newOrc = new Orc(x, y);

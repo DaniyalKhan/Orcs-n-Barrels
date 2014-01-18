@@ -17,7 +17,7 @@ public class Wizard extends Character implements Timeable {
 	
 	private final Circle hitBox;
 	
-	private boolean hurt;
+	public boolean hurt;
 	private float hurtTimer;
 	
 	public Wizard(float x, float y, float width, float height) {
