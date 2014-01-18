@@ -8,7 +8,7 @@ public class Arrow extends LineProjectile {
 	private static final int ARROW_DAMAGE = 1;
 	private static final float VELOCITY = 150f/GameScreen.PIX_PER_UNIT;
 	
-	public Arrow(float x, float y, float angle, int damage) {
+	public Arrow(float x, float y, float angle) {
 		super(x, y, LENGTH, VELOCITY, angle, ARROW_DAMAGE);
 	}
 	

@@ -2,7 +2,6 @@ package com.gca.utils;
 
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.gca.models.Wizard;
 import com.gca.models.projectiles.LineProjectile;
@@ -41,4 +40,8 @@ public class CollisionDetector {
 		
 	}
 
+	public static final boolean orcHit() {
+		return false;
+	}
+	
 }

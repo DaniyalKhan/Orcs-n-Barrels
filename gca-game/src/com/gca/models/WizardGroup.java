@@ -1,5 +1,7 @@
 package com.gca.models;
 
+import java.util.Random;
+
 import com.badlogic.gdx.math.Vector2;
 import com.gca.screens.GameScreen;
 import com.gca.utils.KeyHandler.KeyCallback;
@@ -12,13 +14,13 @@ public class WizardGroup implements KeyCallback, Timeable{
 	private final int RIGHT = 0x002;
 	
 	private final static int START_LIVES = 4;
-	private final Wizard[] wizards;
-	
 	private final float MOVE_SPEED = 125f/GameScreen.PIX_PER_UNIT;
 	
-	private final Vector2 moveSpeed;
-	
+	private final Wizard[] wizards;
+	private final Vector2 moveSpeed;	
 	private int direction;
+
+	private final Random random;
 	
 	public WizardGroup(float midX) {
 		wizards = new Wizard[START_LIVES];
@@ -29,6 +31,16 @@ public class WizardGroup implements KeyCallback, Timeable{
 		}
 		moveSpeed = new Vector2(MOVE_SPEED, 0);
 		direction = STILL;
+		random = new Random();
+	}
+	
+	public int size() {
+		return wizards.length;
+	}
+	
+	public Wizard getRandomWizard() {
+		int index = random.nextInt(size());
+		return wizards[index];
 	}
 	
 	@Override
