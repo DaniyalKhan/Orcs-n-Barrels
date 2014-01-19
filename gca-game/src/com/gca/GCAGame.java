@@ -16,7 +16,7 @@ public class GCAGame extends Game {
 	public void create() {
 		batch = new SpriteBatch();
 		gameScreen = new GameScreen(batch);
-		setScreen(gameScreen);
+		setScreen(new MenuScreen(batch, this));
 	}
 
 	@Override
@@ -31,6 +31,7 @@ public class GCAGame extends Game {
 
 	@Override
 	public void resize(int width, int height) {
+		
 	}
 
 	@Override

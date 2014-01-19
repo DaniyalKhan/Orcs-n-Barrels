@@ -3,6 +3,8 @@ package com.gca.screens;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.GLCommon;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -26,7 +28,8 @@ public class Renderer {
 	private final float width;
 	private final float height;
 	
-	private final TextureAtlas main;
+	public final TextureAtlas main;
+	public final Texture main2;
 	
 	private final Texture background;
 	
@@ -54,7 +57,10 @@ public class Renderer {
 	private final TextureRegion mainBubble;
 	private final TextureRegion moveBubble;
 	
-	ShapeRenderer s = new ShapeRenderer();
+	private final TextureRegion sp1;
+	private final TextureRegion sp2;
+	private final TextureRegion sp3;
+	
 	
 	private final Array<Sprite> orcWalk;
 	private static final float ORC_WALK_FPS = 4f;
@@ -70,7 +76,10 @@ public class Renderer {
 	public Renderer(float width, float height) {
 		this.width = width;
 		this.height = height;
+		
 		main = new TextureAtlas(Gdx.files.internal("main.txt"));
+		main2 = new Texture(Gdx.files.internal("other.png"));
+		
 		cliff = main.createSprite("cliff tile");
 		background = new Texture("background.png");
 		grass = new TextureRegion(background, 1, 1, 100, 100);
@@ -88,6 +97,9 @@ public class Renderer {
 		octopus = main.createSprite("octopus");
 		shadow = main.createSprite("shadow");
 		lid = main.createSprite("barrel top");
+		sp1 = new TextureRegion(main2, 296, 676, 180, 150);
+		sp2 = new TextureRegion(main2, 750, 722, 180, 150);
+		sp3 = new TextureRegion(main2, 2, 870, 160, 150);
 		arr.flip(true, false);
 		
 		cliffs = new float[15];
@@ -157,13 +169,6 @@ public class Renderer {
 		}
 		for (Wizard w : wg.getWizards()) {
 			batch.draw(mainBubble, w.position.x - 0.08f, w.position.y - 1.3f, mainBubble.getRegionWidth()/GameScreen.PIX_PER_UNIT, mainBubble.getRegionHeight()/GameScreen.PIX_PER_UNIT);
-			if (w.direction == Wizard.STILL) {
-				batch.draw(mainBubble, w.position.x - 0.08f, w.position.y - 1.3f, mainBubble.getRegionWidth()/GameScreen.PIX_PER_UNIT, mainBubble.getRegionHeight()/GameScreen.PIX_PER_UNIT);
-			} else if (w.direction == Wizard.RIGHT) {
-				batch.draw(mainBubble, w.position.x - 0.08f, w.position.y - 1.3f, mainBubble.getRegionWidth()/GameScreen.PIX_PER_UNIT, mainBubble.getRegionHeight()/GameScreen.PIX_PER_UNIT);
-			} else if (w.direction == Wizard.LEFT) {
-				batch.draw(mainBubble, w.position.x - 0.08f, w.position.y - 1.3f, mainBubble.getRegionWidth()/GameScreen.PIX_PER_UNIT, mainBubble.getRegionHeight()/GameScreen.PIX_PER_UNIT);
-			}
 		}
 	}
 	
@@ -192,6 +197,16 @@ public class Renderer {
 			}
 			batch.setColor(1.0f, 1.0f, 1.0f, 1f);
 		}
+	}
+	
+	public void spells() {
+		batch.end();
+//		GLCommon gl = Gdx.gl;
+//		gl.glActiveTexture(GL20.GL_TEXTURE0);
+		batch.begin();
+		batch.draw(sp1, 1f, 0f, sp1.getRegionWidth()/GameScreen.PIX_PER_UNIT, sp1.getRegionHeight()/GameScreen.PIX_PER_UNIT);
+//		batch.draw(sp2, 2.5f, 0f, sp2.getRegionWidth()/GameScreen.PIX_PER_UNIT, sp2.getRegionHeight()/GameScreen.PIX_PER_UNIT);
+//		batch.draw(sp3, 4f, 0f, sp3.getRegionWidth()/GameScreen.PIX_PER_UNIT, sp3.getRegionHeight()/GameScreen.PIX_PER_UNIT);
 	}
 	
 	public void orcs(List<Orc> orcs) {
@@ -261,7 +276,7 @@ public class Renderer {
 						Obstacle.FISH_WIDTH, Obstacle.FISH_HEIGHT, 1f, 1f, 0);
 			} else if (ob.type == 3) {
 				batch.draw(rock, ob.position.x, ob.position.y, Obstacle.ROCK_WIDTH/2f, Obstacle.ROCK_HEIGHT/2f, 
-						Obstacle.ROCK_WIDTH, Obstacle.ROCK_HEIGHT, 1f, 1f, 65);
+						Obstacle.ROCK_WIDTH, Obstacle.ROCK_HEIGHT, 1f, 1f, 270);
 			} else if (ob.type == 4) {
 				batch.draw(shark, ob.position.x, ob.position.y, Obstacle.SHARK_WIDTH/2f, Obstacle.SHARK_HEIGHT/2f, 
 						Obstacle.SHARK_WIDTH, Obstacle.SHARK_HEIGHT, 1f, 1f, 270);

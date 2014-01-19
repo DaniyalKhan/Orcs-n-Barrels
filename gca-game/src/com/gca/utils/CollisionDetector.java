@@ -19,7 +19,7 @@ public class CollisionDetector {
 	private static final Vector2 v1 = new Vector2();
 	private static final Vector2 v2 = new Vector2();
 	private static final Vector2 v3 = new Vector2();
-	private static final Rectangle rectangle = new Rectangle();
+	private static Rectangle rectangle = new Rectangle();
 	
 	public static final boolean wizardHit(Wizard w, LineProjectile p) {
 		Circle whb = w.getHitBox();
@@ -34,7 +34,9 @@ public class CollisionDetector {
 	}
 	
 	public static boolean wizardHit (Wizard w, Obstacle o) {
-		return Intersector.overlaps(w.getHitBox(), o.getHitBox());
+		rectangle.set(o.getHitBox());
+		rectangle.x -=0.2f;
+		return Intersector.overlaps(w.getHitBox(), rectangle);
 	}
 	
 }

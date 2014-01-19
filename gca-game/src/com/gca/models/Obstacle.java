@@ -2,6 +2,7 @@ package com.gca.models;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.gca.screens.GameScreen;
+import com.gca.screens.Renderer;
 import com.gca.utils.Timeable;
 
 public class Obstacle extends GameModel implements Timeable {
@@ -51,7 +52,9 @@ public class Obstacle extends GameModel implements Timeable {
 
 	@Override
 	public void addTime(float delta) {
-		position.y -= MOVE_SPEED * delta;
+		if (type == 1 || type == 3) position.y -= Renderer.SPEED * delta;
+		else position.y -= MOVE_SPEED * delta;
+		
 	}
 
 	public int getDamage() {

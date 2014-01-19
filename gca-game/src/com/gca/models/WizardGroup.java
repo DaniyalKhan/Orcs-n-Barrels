@@ -190,7 +190,7 @@ public class WizardGroup implements KeyCallback, Timeable{
 				if (distX < 0) angle = MathUtils.PI2 - angle;
 				else angle = - angle;
 			}
-			addTo.add(new Spell(wizard.position.x + Wizard.SIZE/2f - Spell.FIRE_WIDTH/2f - 0.25f, wizard.position.y + Wizard.SIZE/2f - Spell.FIRE_HEIGHT/2f - 0.25f, Spell.LENGTH, spellVelocity, angle, 1, 1));
+			addTo.add(new Spell(wizard.position.x + Wizard.SIZE/2f - Spell.FIRE_WIDTH/2f + 0.6f, wizard.position.y + Wizard.SIZE/2f - Spell.FIRE_HEIGHT/2f - 0.3f, Spell.LENGTH, spellVelocity, angle, 1, 1));
 		}
 	}
 	

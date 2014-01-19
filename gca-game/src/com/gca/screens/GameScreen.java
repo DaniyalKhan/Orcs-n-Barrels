@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.gca.GCAGame;
+import com.gca.MenuScreen;
 import com.gca.models.Obstacle;
 import com.gca.models.Orc;
 import com.gca.models.Wizard;
@@ -24,7 +25,7 @@ import com.gca.utils.KeyHandler;
 
 public class GameScreen extends AbstractScreen {
 	
-	private static final float VIEWPORT_WIDTH = 6f;
+	public static final float VIEWPORT_WIDTH = 6f;
 	public static final float PIX_PER_UNIT = GCAGame.TARGET_RES_PIX/VIEWPORT_WIDTH;
 	
 	private static final float MAIN_SEG_SIZE = 100f/PIX_PER_UNIT;
@@ -35,7 +36,7 @@ public class GameScreen extends AbstractScreen {
 	public static final float GRASS_BORDER_LEFT = GRASS_BORDER_SIZE - 11f/PIX_PER_UNIT;
 	public static final float GRASS_BORDER_RIGHT = VIEWPORT_WIDTH - GRASS_BORDER_SIZE + 11f/PIX_PER_UNIT;;
 	
-	private final OrthographicCamera camera;
+	public final OrthographicCamera camera;
 	
 	private final List<Orc> orcs;
 	private final List<Orc> deadOrcs;
@@ -52,7 +53,7 @@ public class GameScreen extends AbstractScreen {
 	private float obSpawnTime;
 	private final Random random;
 	
-	private Renderer renderer;
+	protected Renderer renderer;
 	
 	public GameScreen(SpriteBatch batch) {
 		super(batch);
@@ -166,7 +167,8 @@ public class GameScreen extends AbstractScreen {
 		Iterator<Obstacle> obIt = deadObs.iterator();
 		while (obIt.hasNext()) {
 			Obstacle ob = obIt.next();
-			ob.move(0, -delta * Obstacle.MOVE_SPEED);
+			if (ob.type == 1 || ob.type == 3) ob.position.y -= Renderer.SPEED * delta;
+			else ob.position.y -= Obstacle.MOVE_SPEED * delta;
 			ob.opacityMult -= delta * 1.5f;
 			if (ob.opacityMult < 0) obIt.remove();
 		}
@@ -179,10 +181,8 @@ public class GameScreen extends AbstractScreen {
 		}
 		
 	}
-
 	
-	
-	private void spawnObstacle() {
+	public void spawnObstacle() {
 		float x = random.nextInt((int) (RIVER_SIZE - GRASS_BORDER_SIZE)) + 1.4f * GRASS_BORDER_SIZE ;
 		float y = camera.viewportHeight + 1f;
 		Obstacle ob;
@@ -212,10 +212,13 @@ public class GameScreen extends AbstractScreen {
 		renderer.wizards(wizards);
 		renderer.arrows(arrows);
 		renderer.spells(spells);
+		if (!(this instanceof MenuScreen)) {
+			renderer.spells();
+		}
 		batch.end();
 	}
 	
-	private void spawnOrc() {
+	public void spawnOrc() {
 		float x = random.nextDouble() < 0.5 ? 0 : VIEWPORT_WIDTH - 100f/GameScreen.PIX_PER_UNIT;
 		float y = -1f;
 		Orc newOrc;
