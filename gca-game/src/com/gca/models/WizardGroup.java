@@ -56,26 +56,32 @@ public class WizardGroup implements KeyCallback, Timeable{
 		return wizards;
 	}
 	
-	public boolean detectCollision(Arrow arrow) {
+	public boolean detectCollision(Arrow arrow, List<Wizard> toAdd) {
 		Iterator<Wizard> wizardIt = wizards.iterator();
 		while (wizardIt.hasNext()) {
 			Wizard wizard = wizardIt.next();
 			boolean hurt = wizard.hurt;
 		    if (CollisionDetector.wizardHit(wizard, arrow)) {
-		    	if (wizard.onHit(arrow)) wizardIt.remove();
+		    	if (wizard.onHit(arrow)) {
+		    		toAdd.add(wizard);
+		    		wizardIt.remove();
+		    	}
 		    	return (!hurt && wizard.hurt);
 		    }
 		}
 		return false;
 	}
 	
-	public boolean detectCollision(Obstacle obstacle) {
+	public boolean detectCollision(Obstacle obstacle, List<Wizard> toAdd) {
 		Iterator<Wizard> wizardIt = wizards.iterator();
 		while (wizardIt.hasNext()) {
 			Wizard wizard = wizardIt.next();
 			boolean hurt = wizard.hurt;
 		    if (CollisionDetector.wizardHit(wizard, obstacle)) {
-		    	if (wizard.onHit(obstacle)) wizardIt.remove();
+		    	if (wizard.onHit(obstacle)) {
+		    		toAdd.add(wizard);
+		    		wizardIt.remove();
+		    	}
 		    	return (!hurt && wizard.hurt);
 		    }
 		}

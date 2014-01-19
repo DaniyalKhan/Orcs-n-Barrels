@@ -40,6 +40,10 @@ public class Renderer {
 	private final TextureRegion arr;
 	private final TextureRegion spell;
 	
+	private final TextureRegion shadow;
+	
+	private final TextureRegion lid;
+	
 	private final TextureRegion log;
 	private final TextureRegion fish;
 	private final TextureRegion rock;
@@ -82,6 +86,8 @@ public class Renderer {
 		rock = main.createSprite("rock");
 		shark = main.createSprite("shark");
 		octopus = main.createSprite("octopus");
+		shadow = main.createSprite("shadow");
+		lid = main.createSprite("barrel top");
 		arr.flip(true, false);
 		
 		cliffs = new float[15];
@@ -174,6 +180,20 @@ public class Renderer {
 		}
 	}
 	
+	public void wizards(List<Wizard> wizards) {
+		for (Wizard w : wizards) {
+			batch.setColor(1.0f, 1.0f, 1.0f, w.deathOpacity);
+			batch.draw(mainBubble, w.position.x - 0.08f, w.position.y - 1.3f, mainBubble.getRegionWidth()/GameScreen.PIX_PER_UNIT, mainBubble.getRegionHeight()/GameScreen.PIX_PER_UNIT);
+			batch.draw(barrel, w.position.x, w.position.y, Wizard.SIZE, Wizard.SIZE);
+			if (!w.hurt) {
+				batch.draw(wizard, w.position.x, w.position.y, Wizard.WIZARD_WIDTH/2f + 0.05f, Wizard.WIZARD_HEIGHT/2f, Wizard.WIZARD_WIDTH, Wizard.WIZARD_HEIGHT, 1f, 1f, 0);
+			} else {
+				batch.draw(wizard, w.position.x, w.position.y, Wizard.WIZARD_WIDTH/2f + 0.05f, Wizard.WIZARD_HEIGHT/2f, Wizard.WIZARD_WIDTH, Wizard.WIZARD_HEIGHT, 1f, 1f, 0);
+			}
+			batch.setColor(1.0f, 1.0f, 1.0f, 1f);
+		}
+	}
+	
 	public void orcs(List<Orc> orcs) {
 		for (Orc orc: orcs) {
 			TextureRegion frame;
@@ -190,9 +210,15 @@ public class Renderer {
 				frame = orcWalk.get((int) ((orc.animTime * ORC_WALK_FPS) % orcWalk.size));
 				angle = 270;
 			}
-			float width =  frame.getRegionWidth()/GameScreen.PIX_PER_UNIT;
-			float height =  frame.getRegionHeight()/GameScreen.PIX_PER_UNIT;
 						
+			float width =  shadow.getRegionWidth()/GameScreen.PIX_PER_UNIT;
+			float height =  shadow.getRegionHeight()/GameScreen.PIX_PER_UNIT;
+			batch.setColor(1.0f, 1f, 1f, orc.deadOpacity);
+			batch.draw(shadow, orc.position.x + 0.1f, orc.position.y + 0.2f, width/2f, height/2f, width, height, 1f, 1f, 0);
+
+			width =  frame.getRegionWidth()/GameScreen.PIX_PER_UNIT;
+			height =  frame.getRegionHeight()/GameScreen.PIX_PER_UNIT;
+			
 			if (orc instanceof Orc.EliteOrc) {
 				batch.setColor(0.5f, orc.redFilter * 0.5f, orc.redFilter * 0.5f, orc.deadOpacity);
 				batch.draw(frame, orc.position.x, orc.position.y, width/2f, height/2f, width, height, 1f, 1f, angle);
@@ -226,6 +252,7 @@ public class Renderer {
 
 	public void obstacles(List<Obstacle> obstacles) {
 		for (Obstacle ob : obstacles) {
+			batch.setColor(1.0f, 1.0f, 1.0f, ob.opacityMult);
 			if (ob.type == 1) {
 				batch.draw(log, ob.position.x, ob.position.y, Obstacle.LOG_WIDTH/2f, Obstacle.LOG_HEIGHT/2f, 
 						Obstacle.LOG_WIDTH, Obstacle.LOG_HEIGHT, 1f, 1f, 90);
@@ -242,15 +269,16 @@ public class Renderer {
 				batch.draw(octopus, ob.position.x, ob.position.y, Obstacle.OCTOPUS_WIDTH/2f, Obstacle.OCTOPUS_HEIGHT/2f, 
 						Obstacle.OCTOPUS_WIDTH, Obstacle.OCTOPUS_HEIGHT, 1f, 1f, 270);
 			}  
+			batch.setColor(1.0f, 1.0f, 1.0f, 1f);
 		}
-		for (Obstacle ob : obstacles) {
-			batch.end();
-			s.begin(ShapeType.Filled);
-			s.setColor(1f, 1f, 1f, 1f);
-			s.rect(ob.position.x, ob.position.y, ob.getHitBox().width, ob.getHitBox().height);
-			s.end();
-			batch.begin();
-		}
+//		for (Obstacle ob : obstacles) {
+//			batch.end();
+//			s.begin(ShapeType.Filled);
+//			s.setColor(1f, 1f, 1f, 1f);
+//			s.rect(ob.position.x, ob.position.y, ob.getHitBox().width, ob.getHitBox().height);
+//			s.end();
+//			batch.begin();
+//		}
 	}
 	
 	

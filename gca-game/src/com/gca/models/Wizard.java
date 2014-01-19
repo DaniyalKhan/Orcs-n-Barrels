@@ -25,6 +25,8 @@ public class Wizard extends Character implements Timeable {
 	float bottomY;
 	float topY;
 	
+	public float deathOpacity = 1f; 
+	
 	public final static int STILL = 0x000;
 	public final static int LEFT = 0x001;
 	public final static int RIGHT = 0x002;

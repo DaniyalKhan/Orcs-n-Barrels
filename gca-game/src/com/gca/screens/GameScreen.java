@@ -39,6 +39,8 @@ public class GameScreen extends AbstractScreen {
 	
 	private final List<Orc> orcs;
 	private final List<Orc> deadOrcs;
+	private final List<Wizard> deadWizards;
+	private final List<Obstacle> deadObs;
 	private final List<Arrow> arrows;
 	private final List<Spell> spells;
 	private final List<Obstacle> obstacles;
@@ -62,7 +64,8 @@ public class GameScreen extends AbstractScreen {
 		this.random = new Random(); 
 		this.deadOrcs = new LinkedList<Orc>();
 		this.orcSpawnTime = 2f; 
-		
+		this.deadWizards = new LinkedList<Wizard>();
+		this.deadObs = new LinkedList<Obstacle>();
 		float x = 0;
 		float y = 0;
 		
@@ -81,8 +84,6 @@ public class GameScreen extends AbstractScreen {
 	
 	@Override
 	public void addTime(float delta) {
-
-//		wizards.print();
 		
 		super.addTime(delta);
 		
@@ -135,17 +136,22 @@ public class GameScreen extends AbstractScreen {
 		    if (notInBounds(arrow.position)) arrowIt.remove();
 		    else {
 		    	arrow.addTime(delta);
-		    	if (wizards.detectCollision(arrow)) arrowIt.remove();
+		    	if (wizards.detectCollision(arrow, deadWizards)) arrowIt.remove();
 		    }
 		}
 		
 		Iterator<Obstacle> obstacleIt = obstacles.iterator();
 		while (obstacleIt.hasNext()) {
 			Obstacle obstacle = obstacleIt.next();
-		    if (notInBounds(obstacle.position)) obstacleIt.remove();
+		    if (notInBounds(obstacle.position)) {
+		    	obstacleIt.remove();
+		    }
 		    else {
 		    	obstacle.addTime(delta);
-		    	if (wizards.detectCollision(obstacle)) obstacleIt.remove();
+		    	if (wizards.detectCollision(obstacle, deadWizards)) {
+		    		deadObs.add(obstacle);
+		    		obstacleIt.remove();
+		    	}
 		    }
 		}
 		
@@ -155,6 +161,21 @@ public class GameScreen extends AbstractScreen {
 			orc.move(0, -delta * Renderer.SPEED);
 			orc.deadOpacity -= delta * 0.5f;
 			if (orc.deadOpacity < 0) orcIt.remove();
+		}
+		
+		Iterator<Obstacle> obIt = deadObs.iterator();
+		while (obIt.hasNext()) {
+			Obstacle ob = obIt.next();
+			ob.move(0, -delta * Obstacle.MOVE_SPEED);
+			ob.opacityMult -= delta * 1.5f;
+			if (ob.opacityMult < 0) obIt.remove();
+		}
+		
+		Iterator<Wizard> wizardIt = deadWizards.iterator();
+		while (wizardIt.hasNext()) {
+			Wizard w = wizardIt.next();
+			w.deathOpacity -= delta * 0.5f;
+			if (w.deathOpacity < 0f) w.deathOpacity = 0f;
 		}
 		
 	}
@@ -183,12 +204,14 @@ public class GameScreen extends AbstractScreen {
 		renderer.bubble(delta, wizards);
 		renderer.grass();
 		renderer.cliff(delta);
+		renderer.obstacles(deadObs);
+		renderer.obstacles(obstacles);
 		renderer.orcs(deadOrcs);
-		renderer.wizards(wizards);
 		renderer.orcs(orcs);
+		renderer.wizards(deadWizards);
+		renderer.wizards(wizards);
 		renderer.arrows(arrows);
 		renderer.spells(spells);
-		renderer.obstacles(obstacles);
 		batch.end();
 	}
 	

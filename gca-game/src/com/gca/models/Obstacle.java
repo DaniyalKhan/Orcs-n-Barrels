@@ -19,15 +19,17 @@ public class Obstacle extends GameModel implements Timeable {
 	public static float OCTOPUS_WIDTH = 123f/GameScreen.PIX_PER_UNIT;
 	public static float OCTOPUS_HEIGHT = 220f/GameScreen.PIX_PER_UNIT;
 	
-	private static float MOVE_SPEED = 600f/GameScreen.PIX_PER_UNIT;
+	public static float MOVE_SPEED = 600f/GameScreen.PIX_PER_UNIT;
 	
 	private final Rectangle hitBox;
 	
 	public final float type; 
 	
+	public float opacityMult = 1f;
+	
 	public Obstacle(float x, float y, int type) {
 		super(x, y);
-		this.type = 5;
+		this.type = type;
 		if (type == 1) {
 			hitBox = new Rectangle(x, y, LOG_WIDTH, LOG_HEIGHT);
 		} else if (type == 2) {
