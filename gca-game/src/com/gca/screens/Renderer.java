@@ -38,6 +38,7 @@ public class Renderer {
 	private final TextureRegion wizard;
 	
 	private final TextureRegion arr;
+	private final TextureRegion spell;
 	
 	private final TextureRegion sideBubble;
 	private final TextureRegion mainBubble;
@@ -67,6 +68,7 @@ public class Renderer {
 		orcWalk = main.createSprites("orcwalk");
 		orcShoot = main.createSprites("orcshoot");
 		arr = main.createSprite("arrow");
+		spell = new TextureRegion(arr);
 		arr.flip(true, false);
 		
 		cliffs = new float[10];
@@ -125,12 +127,14 @@ public class Renderer {
 		float bubbleWidth = 62f/GameScreen.PIX_PER_UNIT;
 		float bubbleHeight = 200f/GameScreen.PIX_PER_UNIT;
 		for (int i = 0; i < bubbles.length; i++) {
+			
 			bubbles[i] -= delta * SPEED;
 			sideBubble.flip(true, false);
 			batch.draw(sideBubble,  100f/GameScreen.PIX_PER_UNIT, bubbles[i], 0f, 0f, bubbleWidth, bubbleHeight, 1f, 1f, 0);
 			sideBubble.flip(true, false);
 			batch.draw(sideBubble, width - 100f/GameScreen.PIX_PER_UNIT - bubbleWidth, bubbles[i], 0f, 0f, bubbleWidth, bubbleHeight, 1f, 1f, 0);
 			if (bubbles[i] + bubbleHeight < 0) bubbles[i] = height;
+			
 		}
 		for (Wizard w : wg.getWizards()) {
 			if (w.direction == Wizard.STILL) {
@@ -176,12 +180,15 @@ public class Renderer {
 			}
 			float width =  frame.getRegionWidth()/GameScreen.PIX_PER_UNIT;
 			float height =  frame.getRegionHeight()/GameScreen.PIX_PER_UNIT;
+						
 			if (orc instanceof Orc.EliteOrc) {
-				batch.setColor(0.2f, 0.6f, 0.2f, 1f);
+				batch.setColor(0.5f, orc.redFilter * 0.5f, orc.redFilter * 0.5f, 1f);
 				batch.draw(frame, orc.position.x, orc.position.y, width/2f, height/2f, width, height, 1f, 1f, angle);
 				batch.setColor(1.0f, 1.0f, 1.0f, 1f);
 			} else {
+				batch.setColor(1.0f, orc.redFilter, orc.redFilter, 1f);
 				batch.draw(frame, orc.position.x, orc.position.y, width/2f, height/2f, width, height, 1f, 1f, angle);
+				batch.setColor(1.0f, 1.0f, 1.0f, 1f);
 			}
 		}
 	}
@@ -190,7 +197,8 @@ public class Renderer {
 		float arrWidth = arr.getRegionWidth()/GameScreen.PIX_PER_UNIT;
 		float arrHeight = arr.getRegionHeight()/GameScreen.PIX_PER_UNIT;
 		for (Arrow arrow: arrows) {
-			batch.draw(arr, arrow.position.x, arrow.position.y, arrWidth/2f, arrHeight/2f, arrWidth, arrHeight, 
+			if (arrow.delay >= Arrow.DELAY_THRESHOLD) 
+				batch.draw(arr, arrow.position.x, arrow.position.y, arrWidth/2f, arrHeight/2f, arrWidth, arrHeight, 
 					1f, 1f, arrow.angle / MathUtils.PI * 180f);
 		}
 	}

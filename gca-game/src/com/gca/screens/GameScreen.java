@@ -15,8 +15,10 @@ import com.gca.models.Obstacle;
 import com.gca.models.Orc;
 import com.gca.models.Wizard;
 import com.gca.models.WizardGroup;
+import com.gca.models.Orc.EliteOrc;
 import com.gca.models.projectiles.Arrow;
 import com.gca.models.projectiles.Spell;
+import com.gca.utils.CollisionDetector;
 import com.gca.utils.KeyHandler;
 
 public class GameScreen extends AbstractScreen {
@@ -72,33 +74,37 @@ public class GameScreen extends AbstractScreen {
 		
 		wizards.addTime(delta);
 		
+		Iterator<Spell> spellIt = spells.iterator();
+		while (spellIt.hasNext()) {
+			Spell spell = spellIt.next();
+		    if (notInBounds(spell.position)) spellIt.remove();
+		    else {
+		    	spell.addTime(delta);
+		    	if (detectCollision(spell)) spellIt.remove();
+		    }
+		}
+		
 		if (timeSinceOrcSpawn >= orcSpawnTime) {
 			timeSinceOrcSpawn = 0;
-			orcSpawnTime = random.nextFloat() * 2 + 1;
+			orcSpawnTime = random.nextFloat() + 1;
 			spawnOrc();
 		} else timeSinceOrcSpawn += delta;
 		
 		for (Orc orc: orcs) {
 			orc.addTime(delta);
 			if (orc.shootArrow()) {
-				Wizard target = wizards.getRandomWizard();
-				float distance = orc.position.dst(target.position);		
-				float distX = Math.abs(orc.position.x - target.position.x);
-				float angle = (float) Math.acos(distX/distance);
-				if (orc.position.x < target.position.x && orc.position.y > target.position.y) {
-					angle = MathUtils.PI2 - angle;
-				} else if (orc.position.x > target.position.x && orc.position.y < target.position.y) {
-					angle = MathUtils.PI - angle;
-				} else if (orc.position.x > target.position.x && orc.position.y > target.position.y) {
-					angle = MathUtils.PI + angle;
+				float preciseProb = 0.25f;
+				if (orc instanceof EliteOrc) preciseProb = 0.75f;
+				if (random.nextDouble() <= preciseProb) {
+					preciseArrow(orc);
+				} else {
+					float angle =  (float) Math.atan(random.nextDouble());
+					if (orc.position.x > VIEWPORT_WIDTH/2f) 
+						angle += MathUtils.PI;
+					Vector2 arrowVelocity = new Vector2(Arrow.VELOCITY * MathUtils.cos(angle), Arrow.VELOCITY * MathUtils.sin(angle));
+					float posX =  orc.position.x + Orc.ORC_WIDTH/2f - Arrow.ARROW_WIDTH/2f;
+					arrows.add(new Arrow(posX, orc.position.y + Orc.ORC_HEIGHT/2f - Arrow.ARROW_HEIGHT/2f + 0.15f, arrowVelocity, angle, orc.getDamage()));
 				}
-				orc.angle = angle;
-				Vector2 arrowVelocity = new Vector2(Arrow.VELOCITY * MathUtils.cos(angle), Arrow.VELOCITY * MathUtils.sin(angle));
-				float posX =  orc.position.x + Orc.ORC_WIDTH/2f - Arrow.ARROW_WIDTH/2f;
-				if (posX > VIEWPORT_WIDTH) posX = VIEWPORT_WIDTH;
-				if (posX < 0) posX = 0;
-				Arrow a = new Arrow(posX, orc.position.y + Orc.ORC_HEIGHT/2f - Arrow.ARROW_HEIGHT/2f + 0.15f, arrowVelocity, angle, orc.getDamage());
-				arrows.add(a);
 			}
 		}
 		
@@ -119,16 +125,6 @@ public class GameScreen extends AbstractScreen {
 		    else {
 		    	obstacle.addTime(delta);
 		    	if (wizards.detectCollision(obstacle)) obstacleIt.remove();
-		    }
-		}
-		
-		Iterator<Spell> spellIt = spells.iterator();
-		while (spellIt.hasNext()) {
-			Spell spell = spellIt.next();
-		    if (notInBounds(spell.position)) spellIt.remove();
-		    else {
-		    	spell.addTime(delta);
-//		    	if (wizards.detectCollision(obstacle)) obstacleIt.remove();
 		    }
 		}
 		
@@ -160,6 +156,41 @@ public class GameScreen extends AbstractScreen {
 		newOrc.setDestination(newOrc.position.x, random.nextFloat() * camera.viewportHeight * 0.8f);
 		orcs.add(newOrc);
 	}
+	
+	public void preciseArrow(Orc orc) {
+		Wizard target = wizards.getRandomWizard();
+		float distance = orc.position.dst(target.position);		
+		float distX = Math.abs(orc.position.x - target.position.x);
+		float angle = (float) Math.acos(distX/distance);
+		if (orc.position.x < target.position.x && orc.position.y > target.position.y) {
+			angle = MathUtils.PI2 - angle;
+		} else if (orc.position.x > target.position.x && orc.position.y < target.position.y) {
+			angle = MathUtils.PI - angle;
+		} else if (orc.position.x > target.position.x && orc.position.y > target.position.y) {
+			angle = MathUtils.PI + angle;
+		}
+		orc.angle = angle;
+		Vector2 arrowVelocity = new Vector2(Arrow.VELOCITY * MathUtils.cos(angle), Arrow.VELOCITY * MathUtils.sin(angle));
+		float posX =  orc.position.x + Orc.ORC_WIDTH/2f - Arrow.ARROW_WIDTH/2f;
+		if (posX > VIEWPORT_WIDTH) posX = VIEWPORT_WIDTH;
+		if (posX < 0) posX = 0;
+		Arrow a = new Arrow(posX, orc.position.y + Orc.ORC_HEIGHT/2f - Arrow.ARROW_HEIGHT/2f + 0.15f, arrowVelocity, angle, orc.getDamage());
+		arrows.add(a);
+	}
+	
+	public boolean detectCollision(Spell spell) {
+		Iterator<Orc> orcIt = orcs.iterator();
+		while (orcIt.hasNext()) {
+			Orc orc = orcIt.next();
+		    if (CollisionDetector.orcHit(orc, spell)) {
+		    	orc.redFilter = 0.25f;
+		    	if (orc.onHit(spell)) orcIt.remove();
+		    	return true;
+		    }
+		}
+		return false;
+	}
+	
 	
 	private boolean notInBounds(Vector2 v) {
 		return (v.x > VIEWPORT_WIDTH && v.x < 0 && v.y > camera.viewportHeight && v.y < 0);

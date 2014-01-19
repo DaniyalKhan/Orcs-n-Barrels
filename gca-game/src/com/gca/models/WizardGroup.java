@@ -148,15 +148,17 @@ public class WizardGroup implements KeyCallback, Timeable{
 	}
 	
 	public void cast(float targetX, float targetY, List<Spell> addTo) {
-		
 		for (Wizard wizard: wizards) {
 			float distance = wizard.position.dst(targetX, targetY);		
 			float distX = targetX - wizard.position.x;
 			float angle = (float) Math.acos(distX/distance);
 			Vector2 spellVelocity = new Vector2(MathUtils.cos(angle) * Spell.VELOCITY, MathUtils.sin(angle) * Spell.VELOCITY);
-			if (targetY - wizard.position.y < 0) spellVelocity.scl(1f, -1f);
-			if (distX < 0) spellVelocity.scl(-1f, 1f);
-			addTo.add(new Spell(wizard.position.x + Wizard.SIZE/2f, wizard.position.y + Wizard.SIZE/2f, Spell.LENGTH, spellVelocity, angle, 1));
+			if (targetY - wizard.position.y < 0) {
+				spellVelocity.y *= -1;
+				if (distX < 0) angle = MathUtils.PI2 - angle;
+				else angle = - angle;
+			}
+			addTo.add(new Spell(wizard.position.x + Wizard.SIZE/2f - Spell.SPELL_WIDTH/2f - 0.25f, wizard.position.y + Wizard.SIZE/2f - Spell.SPELL_HEIGHT/2f - 0.25f, Spell.LENGTH, spellVelocity, angle, 1));
 		}
 	}
 	

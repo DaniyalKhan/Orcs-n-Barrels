@@ -5,7 +5,7 @@ import com.gca.models.projectiles.Projectile;
 
 public class Character extends GameModel {
 
-	protected int health;
+	public int health;
 	
 	public Character(float x, float y, int health) {
 		super(x, y);
@@ -18,6 +18,7 @@ public class Character extends GameModel {
 	
 	protected final boolean damage(int damage) {
 		health -= damage;
+		System.out.println(health);
 		if (health <= 0) return true;
 		return false;
 	}

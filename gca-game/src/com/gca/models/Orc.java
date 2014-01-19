@@ -1,17 +1,20 @@
 package com.gca.models;
 
+import java.util.Iterator;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.gca.models.projectiles.Arrow;
 import com.gca.screens.GameScreen;
+import com.gca.utils.CollisionDetector;
 import com.gca.utils.Timeable;
 
 
 public class Orc extends Character implements Timeable {
 	
-	private static final int HEALTH = 3;
+	private static final int HEALTH = 5;
 	private static final int ARROW_DAMAGE = 1;
 	public static final float ORC_WIDTH = 75/GameScreen.PIX_PER_UNIT;
 	public static final float ORC_HEIGHT = 75/GameScreen.PIX_PER_UNIT;
@@ -26,6 +29,8 @@ public class Orc extends Character implements Timeable {
 	public float animTime;
 	public float angle;
 	public boolean shooting;
+	
+	public float redFilter = 1f;
 	
 	public Orc(float x, float y) {
 		super(x, y, HEALTH);
@@ -68,17 +73,24 @@ public class Orc extends Character implements Timeable {
 				timeSinceShoot = 0;
 				shootTimer = 1f;
 			}
+		}
+		if (redFilter < 1f) {
+			redFilter += delta * 0.5f;
+			if (redFilter > 1f) redFilter = 1f;
 		} 
+	}
+	
+	public static int getMaxHealth() {
+		return HEALTH;
 	}
 	
 	public int getDamage() {
 		return ARROW_DAMAGE;
 	}
-	
 	public static class EliteOrc extends Orc {
 
 		public static final int ARROW_DAMAGE = 2;
-		public static final float HEALTH = 5;
+		public static final int HEALTH = 8;
 		private static final float MOVE_SPEED = 175f/GameScreen.PIX_PER_UNIT;
 		
 		public EliteOrc(float x, float y) {
@@ -87,6 +99,10 @@ public class Orc extends Character implements Timeable {
 		
 		public int getDamage() {
 			return ARROW_DAMAGE;
+		}
+		
+		public static int getMaxHealth() {
+			return HEALTH;
 		}
 		
 	}
