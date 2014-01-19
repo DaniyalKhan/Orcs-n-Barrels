@@ -19,10 +19,8 @@ import com.gca.models.projectiles.Spell;
 
 public class Renderer {
 
-	private static final float SPEED = 300f/GameScreen.PIX_PER_UNIT;
-	
-	private static final ShapeRenderer s = new ShapeRenderer();
-	
+	public static final float SPEED = 500f/GameScreen.PIX_PER_UNIT;
+		
 	private final float width;
 	private final float height;
 	
@@ -71,13 +69,13 @@ public class Renderer {
 		spell = new TextureRegion(arr);
 		arr.flip(true, false);
 		
-		cliffs = new float[10];
+		cliffs = new float[15];
 		float cliffWidth = 100f/GameScreen.PIX_PER_UNIT;
 		for (int i = 0; i < cliffs.length ; i++) {
 			cliffs[i] = cliffWidth * i;
 		}
 		
-		bubbles = new float[5];
+		bubbles = new float[10];
 		float bubbleHeight = 200f/GameScreen.PIX_PER_UNIT;
 		for (int i = 0; i < bubbles.length ; i++) {
 			bubbles[i] = bubbleHeight * i;
@@ -182,11 +180,11 @@ public class Renderer {
 			float height =  frame.getRegionHeight()/GameScreen.PIX_PER_UNIT;
 						
 			if (orc instanceof Orc.EliteOrc) {
-				batch.setColor(0.5f, orc.redFilter * 0.5f, orc.redFilter * 0.5f, 1f);
+				batch.setColor(0.5f, orc.redFilter * 0.5f, orc.redFilter * 0.5f, orc.deadOpacity);
 				batch.draw(frame, orc.position.x, orc.position.y, width/2f, height/2f, width, height, 1f, 1f, angle);
 				batch.setColor(1.0f, 1.0f, 1.0f, 1f);
 			} else {
-				batch.setColor(1.0f, orc.redFilter, orc.redFilter, 1f);
+				batch.setColor(1.0f, orc.redFilter, orc.redFilter, orc.deadOpacity);
 				batch.draw(frame, orc.position.x, orc.position.y, width/2f, height/2f, width, height, 1f, 1f, angle);
 				batch.setColor(1.0f, 1.0f, 1.0f, 1f);
 			}

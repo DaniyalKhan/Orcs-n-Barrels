@@ -6,7 +6,7 @@ import com.gca.screens.GameScreen;
 
 public class GCAGame extends Game {
 	
-	public static final float TARGET_RES_PIX = 720f;
+	public static final float TARGET_RES_PIX = 700f;
 	
 	GameScreen gameScreen;
 	

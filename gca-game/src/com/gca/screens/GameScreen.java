@@ -37,6 +37,7 @@ public class GameScreen extends AbstractScreen {
 	private final OrthographicCamera camera;
 	
 	private final List<Orc> orcs;
+	private final List<Orc> deadOrcs;
 	private final List<Arrow> arrows;
 	private final List<Spell> spells;
 	private final List<Obstacle> obstacles;
@@ -62,6 +63,7 @@ public class GameScreen extends AbstractScreen {
 			}
 		});
 		this.random = new Random(); 
+		this.deadOrcs = new LinkedList<Orc>();
 		this.orcSpawnTime = 2f; 
 	}
 	
@@ -128,6 +130,14 @@ public class GameScreen extends AbstractScreen {
 		    }
 		}
 		
+		Iterator<Orc> orcIt = deadOrcs.iterator();
+		while (orcIt.hasNext()) {
+			Orc orc = orcIt.next();
+			orc.move(0, -delta * renderer.SPEED);
+			orc.deadOpacity -= delta * 0.5f;
+			if (orc.deadOpacity < 0) orcIt.remove();
+		}
+		
 	}
 
 	@Override
@@ -140,6 +150,7 @@ public class GameScreen extends AbstractScreen {
 		renderer.bubble(delta, wizards);
 		renderer.grass();
 		renderer.cliff(delta);
+		renderer.orcs(deadOrcs);
 		renderer.wizards(wizards);
 		renderer.orcs(orcs);
 		renderer.arrows(arrows);
@@ -184,7 +195,10 @@ public class GameScreen extends AbstractScreen {
 			Orc orc = orcIt.next();
 		    if (CollisionDetector.orcHit(orc, spell)) {
 		    	orc.redFilter = 0.25f;
-		    	if (orc.onHit(spell)) orcIt.remove();
+		    	if (orc.onHit(spell)) {
+		    		orcIt.remove();
+		    		deadOrcs.add(orc);
+		    	}
 		    	return true;
 		    }
 		}

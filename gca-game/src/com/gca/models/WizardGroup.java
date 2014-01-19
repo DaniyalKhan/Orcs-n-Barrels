@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Peripheral;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.gca.models.projectiles.Arrow;
@@ -87,10 +88,26 @@ public class WizardGroup implements KeyCallback, Timeable{
 	
 	@Override
 	public void addTime(float delta) {
-		int i = -1;
 		lastResponseTimeStamp +=delta;
+		if (Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer) && lastResponseTimeStamp > 0.15f) {
+			if (Gdx.input.getAccelerometerX() > 1f) {
+				if (direction != Wizard.LEFT) {
+					direction = Wizard.LEFT;
+					lastResponseTimeStamp = 0;
+				}
+			} else if (Gdx.input.getAccelerometerX() < - 1f) {
+				if (direction != Wizard.RIGHT) {
+					direction = Wizard.RIGHT;
+					lastResponseTimeStamp = 0;
+				}
+			} else {
+				if (direction != Wizard.STILL) {
+					direction = Wizard.STILL;
+					lastResponseTimeStamp = 0;
+				}
+			}
+		}
 		for (Wizard wizard: wizards) {
-			i++;
 			if (wizard.responseThreshold <= lastResponseTimeStamp) {
 				wizard.direction = direction;
 			}
@@ -127,17 +144,7 @@ public class WizardGroup implements KeyCallback, Timeable{
 		direction = Wizard.STILL;
 		lastResponseTimeStamp = 0;
 	}
-
-	public void print() {
-		
-		Gdx.app.log("# remaining ",  Integer.toString(size()));
-		
-		for (int i = 0; i < wizards.size(); i++) {
-			Gdx.app.log("wizard " + i + " has hp: ",  Integer.toString(wizards.get(i).health));
-		}
-		
-	}
-
+	
 	@Override
 	public void onTouch(float x, float y) {
 		callback.useSpell(x, y);

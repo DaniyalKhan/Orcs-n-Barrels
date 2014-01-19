@@ -18,7 +18,7 @@ public class Orc extends Character implements Timeable {
 	private static final int ARROW_DAMAGE = 1;
 	public static final float ORC_WIDTH = 75/GameScreen.PIX_PER_UNIT;
 	public static final float ORC_HEIGHT = 75/GameScreen.PIX_PER_UNIT;
-	private static final float MOVE_SPEED = 125f/GameScreen.PIX_PER_UNIT;
+	public static final float MOVE_SPEED = 125f/GameScreen.PIX_PER_UNIT;
 	
 	private static final Random RAND = new Random();
 	private final Rectangle hitBox;	
@@ -31,6 +31,8 @@ public class Orc extends Character implements Timeable {
 	public boolean shooting;
 	
 	public float redFilter = 1f;
+	
+	public float deadOpacity = 1f;
 	
 	public Orc(float x, float y) {
 		super(x, y, HEALTH);
@@ -91,7 +93,6 @@ public class Orc extends Character implements Timeable {
 
 		public static final int ARROW_DAMAGE = 2;
 		public static final int HEALTH = 8;
-		private static final float MOVE_SPEED = 175f/GameScreen.PIX_PER_UNIT;
 		
 		public EliteOrc(float x, float y) {
 			super(x, y);
