@@ -3,16 +3,13 @@ package com.gca.screens;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.GLCommon;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.gca.models.Obstacle;
 import com.gca.models.Orc;
@@ -23,7 +20,7 @@ import com.gca.models.projectiles.Spell;
 
 public class Renderer {
 
-	public static final float SPEED = 500f/GameScreen.PIX_PER_UNIT;
+	public static float SPEED = 500f/GameScreen.PIX_PER_UNIT;
 		
 	private final float width;
 	private final float height;
@@ -60,7 +57,10 @@ public class Renderer {
 	private final TextureRegion sp1;
 	private final TextureRegion sp2;
 	private final TextureRegion sp3;
-	
+
+	private final TextureRegion text1;
+	private final TextureRegion text2;
+	private final TextureRegion text3;
 	
 	private final Array<Sprite> orcWalk;
 	private static final float ORC_WALK_FPS = 4f;
@@ -72,6 +72,14 @@ public class Renderer {
 		
 	private final float cliffs[];
 	private final float bubbles[];
+
+	private TextureRegion gameOver;
+
+	private TextureRegion replay;
+
+	private TextureRegion yesT;
+
+	private TextureRegion noT;
 	
 	public Renderer(float width, float height) {
 		this.width = width;
@@ -89,6 +97,7 @@ public class Renderer {
 		orcWalk = main.createSprites("orcwalk");
 		orcShoot = main.createSprites("orcshoot");
 		arr = main.createSprite("arrow");
+		arr.flip(true, false);
 		spell = main.createSprite("fire");
 		log = main.createSprite("log");
 		fish = main.createSprite("fish");
@@ -100,8 +109,16 @@ public class Renderer {
 		sp1 = new TextureRegion(main2, 296, 676, 180, 150);
 		sp2 = new TextureRegion(main2, 750, 722, 180, 150);
 		sp3 = new TextureRegion(main2, 2, 870, 160, 150);
-		arr.flip(true, false);
 		
+		text1 = main.createSprite("1");
+		text2 = main.createSprite("2");
+		text3 = main.createSprite("3");
+		
+		gameOver = new TextureRegion(main2, 594, 66, 388,100);
+		replay = new TextureRegion(main2, 2, 694, 236, 100);
+		yesT = new TextureRegion(main2, 521, 491, 66, 120);
+		noT = new TextureRegion(main2, 325, 918, 96, 75);
+
 		cliffs = new float[15];
 		float cliffWidth = 100f/GameScreen.PIX_PER_UNIT;
 		for (int i = 0; i < cliffs.length ; i++) {
@@ -122,6 +139,38 @@ public class Renderer {
 	
 	public void setSpriteBatch(SpriteBatch b) {
 		batch = b;
+	}
+	
+	public void gameOver() {
+		batch.draw(gameOver, (width - gameOver.getRegionWidth()/GameScreen.PIX_PER_UNIT)/2f, height - 2f, 
+				gameOver.getRegionWidth()/GameScreen.PIX_PER_UNIT, gameOver.getRegionHeight()/GameScreen.PIX_PER_UNIT);
+		batch.draw(replay, (width - replay.getRegionWidth()/GameScreen.PIX_PER_UNIT)/2f,height - 5f, 
+				replay.getRegionWidth()/GameScreen.PIX_PER_UNIT, replay.getRegionHeight()/GameScreen.PIX_PER_UNIT);
+		if (drawYes)
+		batch.draw(yesT, (width - yesT.getRegionWidth()/GameScreen.PIX_PER_UNIT)/2f,height - 6.5f, 
+				yesT.getRegionWidth()/GameScreen.PIX_PER_UNIT/2f, yesT.getRegionHeight()/GameScreen.PIX_PER_UNIT/2f,
+				yesT.getRegionWidth()/GameScreen.PIX_PER_UNIT, yesT.getRegionHeight()/GameScreen.PIX_PER_UNIT, 1f, 1f, 270);
+		if (drawNo)
+		batch.draw(noT, (width - noT.getRegionWidth()/GameScreen.PIX_PER_UNIT)/2f, height - 7.5f, 
+				noT.getRegionWidth()/GameScreen.PIX_PER_UNIT, noT.getRegionHeight()/GameScreen.PIX_PER_UNIT);
+	}
+	
+	Rectangle yesRect = new Rectangle();
+	Rectangle noRect = new Rectangle();
+	
+	public boolean drawYes = true;
+	public boolean drawNo = true;;
+	
+	public Rectangle getYesRect() {
+		yesRect.set((width - yesT.getRegionWidth()/GameScreen.PIX_PER_UNIT)/2f,height - 6.5f, 
+				yesT.getRegionWidth()/GameScreen.PIX_PER_UNIT, yesT.getRegionHeight()/GameScreen.PIX_PER_UNIT);
+		return yesRect;
+	}
+	
+	public Rectangle getNoRect() {
+		noRect.set((width - noT.getRegionWidth()/GameScreen.PIX_PER_UNIT)/2f, height - 7.5f, 
+				noT.getRegionWidth()/GameScreen.PIX_PER_UNIT, noT.getRegionHeight()/GameScreen.PIX_PER_UNIT);
+		return noRect;
 	}
 	
 	public void grass() {
@@ -294,6 +343,22 @@ public class Renderer {
 //			s.end();
 //			batch.begin();
 //		}
+	}
+
+	public void timer(float timer) {
+		TextureRegion time;
+		if (timer <=3 ) time = text3;
+		else if (timer <=2 ) time = text2;
+		else time = text1;
+		
+		if (timer <=2) {
+			batch.draw(time, (width - time.getRegionWidth()/GameScreen.PIX_PER_UNIT)/2f, (height - time.getRegionHeight()/GameScreen.PIX_PER_UNIT)/2f, 
+					time.getRegionWidth()/2f, time.getRegionHeight()/2f, 
+					time.getRegionWidth()/GameScreen.PIX_PER_UNIT, time.getRegionHeight()/GameScreen.PIX_PER_UNIT, 1f, 1f, 270);
+		} else {
+			batch.draw(time, (width - time.getRegionWidth()/GameScreen.PIX_PER_UNIT)/2f, (height - time.getRegionHeight()/GameScreen.PIX_PER_UNIT)/2f, 
+					time.getRegionWidth()/GameScreen.PIX_PER_UNIT, time.getRegionHeight()/GameScreen.PIX_PER_UNIT);
+		}
 	}
 	
 	

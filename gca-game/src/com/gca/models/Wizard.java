@@ -7,13 +7,13 @@ import com.gca.utils.Timeable;
 
 public class Wizard extends Character implements Timeable {
 
-	private static final int HEALTH = 5;
+	private static final int HEALTH = 1; //5
 	public static final float SIZE = 100f/GameScreen.PIX_PER_UNIT;
 	public static final float WIZARD_WIDTH = 88f/GameScreen.PIX_PER_UNIT;
 	public static final float WIZARD_HEIGHT = 80f/GameScreen.PIX_PER_UNIT;
 	
 	private static final float RADIUS = (float) (Math.sqrt(2) * SIZE)/2f;
-	private static final float DAMAGE_RESET = 2.5f;
+	private static final float DAMAGE_RESET = 2.5f; //2.5
 	
 	private final Circle hitBox;
 	

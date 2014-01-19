@@ -7,6 +7,8 @@ import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Peripheral;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
@@ -15,15 +17,17 @@ import com.gca.GCAGame;
 import com.gca.MenuScreen;
 import com.gca.models.Obstacle;
 import com.gca.models.Orc;
+import com.gca.models.Orc.EliteOrc;
 import com.gca.models.Wizard;
 import com.gca.models.WizardGroup;
-import com.gca.models.Orc.EliteOrc;
 import com.gca.models.projectiles.Arrow;
 import com.gca.models.projectiles.Spell;
 import com.gca.utils.CollisionDetector;
 import com.gca.utils.KeyHandler;
 
 public class GameScreen extends AbstractScreen {
+	
+	float timer;
 	
 	public static final float VIEWPORT_WIDTH = 6f;
 	public static final float PIX_PER_UNIT = GCAGame.TARGET_RES_PIX/VIEWPORT_WIDTH;
@@ -55,7 +59,11 @@ public class GameScreen extends AbstractScreen {
 	
 	protected Renderer renderer;
 	
-	public GameScreen(SpriteBatch batch) {
+	boolean gameOver;
+	
+	GCAGame game;
+	
+	public GameScreen(SpriteBatch batch, GCAGame game) {
 		super(batch);
 		this.camera = new OrthographicCamera();
 		this.orcs = new LinkedList<Orc>();
@@ -67,6 +75,9 @@ public class GameScreen extends AbstractScreen {
 		this.orcSpawnTime = 2f; 
 		this.deadWizards = new LinkedList<Wizard>();
 		this.deadObs = new LinkedList<Obstacle>();
+		this.gameOver = false;
+		this.game = game;
+		this.timer = 1f; 
 		float x = 0;
 		float y = 0;
 		
@@ -83,11 +94,44 @@ public class GameScreen extends AbstractScreen {
 		
 	}
 	
+	public void deathStuff(float delta) {
+		Iterator<Wizard> wizardIt = deadWizards.iterator();
+		while (wizardIt.hasNext()) {
+			Wizard w = wizardIt.next();
+			w.deathOpacity -= delta * 0.5f;
+			if (w.deathOpacity < 0f) w.deathOpacity = 0f;
+		}
+		Iterator<Orc> orcIt = deadOrcs.iterator();
+		while (orcIt.hasNext()) {
+			Orc orc = orcIt.next();
+			orc.move(0, -delta * Renderer.SPEED);
+			orc.deadOpacity -= delta * 0.5f;
+			if (orc.deadOpacity < 0) orcIt.remove();
+		}
+		
+		Iterator<Obstacle> obIt = deadObs.iterator();
+		while (obIt.hasNext()) {
+			Obstacle ob = obIt.next();
+			if (ob.type == 1 || ob.type == 3) ob.position.y -= Renderer.SPEED * delta;
+			else ob.position.y -= Obstacle.MOVE_SPEED * delta;
+			ob.opacityMult -= delta * 1.5f;
+			if (ob.opacityMult < 0) obIt.remove();
+		}
+	}
+	
 	@Override
 	public void addTime(float delta) {
-		
 		super.addTime(delta);
-		
+		timer-=delta;
+		if (timer < 0) {
+			if (!gameOver) {
+				logic(delta);
+			}
+			deathStuff(delta);
+		}
+	}
+	
+	public void logic(float delta) {
 		wizards.addTime(delta);
 		
 		Iterator<Spell> spellIt = spells.iterator();
@@ -115,8 +159,8 @@ public class GameScreen extends AbstractScreen {
 		for (Orc orc: orcs) {
 			orc.addTime(delta);
 			if (orc.shootArrow()) {
-				float preciseProb = 0.25f;
-				if (orc instanceof EliteOrc) preciseProb = 0.75f;
+				float preciseProb = 0.66f;
+				if (orc instanceof EliteOrc) preciseProb = 1f;
 				if (random.nextDouble() <= preciseProb) {
 					preciseArrow(orc);
 				} else {
@@ -155,32 +199,27 @@ public class GameScreen extends AbstractScreen {
 		    	}
 		    }
 		}
-		
-		Iterator<Orc> orcIt = deadOrcs.iterator();
-		while (orcIt.hasNext()) {
-			Orc orc = orcIt.next();
-			orc.move(0, -delta * Renderer.SPEED);
-			orc.deadOpacity -= delta * 0.5f;
-			if (orc.deadOpacity < 0) orcIt.remove();
+	
+		if (wizards.size() == 0) {
+			gameOver = true;
+			Gdx.input.setInputProcessor(new InputAdapter() {
+				@Override
+				public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+					float x = screenX/GameScreen.PIX_PER_UNIT;
+					float y = camera.viewportHeight - screenY/GameScreen.PIX_PER_UNIT;
+					if (renderer.getYesRect().contains(x - 0.3f, y + 0.4f)) {
+						game.setScreen(new GameScreen(batch, game));
+						return true;
+					} else if (renderer.getNoRect().contains(x - 0.3f, y + 0.4f)) {
+						game.setScreen(new MenuScreen(batch, game));
+						return true;
+					}
+					return false;
+				}
+			});
 		}
-		
-		Iterator<Obstacle> obIt = deadObs.iterator();
-		while (obIt.hasNext()) {
-			Obstacle ob = obIt.next();
-			if (ob.type == 1 || ob.type == 3) ob.position.y -= Renderer.SPEED * delta;
-			else ob.position.y -= Obstacle.MOVE_SPEED * delta;
-			ob.opacityMult -= delta * 1.5f;
-			if (ob.opacityMult < 0) obIt.remove();
-		}
-		
-		Iterator<Wizard> wizardIt = deadWizards.iterator();
-		while (wizardIt.hasNext()) {
-			Wizard w = wizardIt.next();
-			w.deathOpacity -= delta * 0.5f;
-			if (w.deathOpacity < 0f) w.deathOpacity = 0f;
-		}
-		
 	}
+
 	
 	public void spawnObstacle() {
 		float x = random.nextInt((int) (RIVER_SIZE - GRASS_BORDER_SIZE)) + 1.4f * GRASS_BORDER_SIZE ;
@@ -197,9 +236,16 @@ public class GameScreen extends AbstractScreen {
 	@Override
 	public void draw(float delta) {
 		super.draw(delta);
+		
 		batch.setProjectionMatrix(camera.combined);
+		if (gameOver)  {
+			batch.setColor(Color.GRAY);
+			Renderer.SPEED = 0;
+		}
 		batch.begin();
-		renderer.setSpriteBatch(batch);
+		if (timer > 0f && !(this instanceof MenuScreen)) {
+			renderer.timer(timer);
+		} 
 		renderer.water();
 		renderer.bubble(delta, wizards);
 		renderer.grass();
@@ -214,6 +260,9 @@ public class GameScreen extends AbstractScreen {
 		renderer.spells(spells);
 		if (!(this instanceof MenuScreen)) {
 			renderer.spells();
+		}
+		if (gameOver) {
+			renderer.gameOver();
 		}
 		batch.end();
 	}
@@ -275,7 +324,9 @@ public class GameScreen extends AbstractScreen {
 		float aspectRatio = ((float)Gdx.graphics.getHeight())/Gdx.graphics.getWidth();
 		camera.setToOrtho(false, VIEWPORT_WIDTH, aspectRatio * VIEWPORT_WIDTH);
 		renderer = new Renderer(VIEWPORT_WIDTH, camera.viewportHeight);
+		Renderer.SPEED = 500f/PIX_PER_UNIT;
 		Gdx.input.setInputProcessor(new KeyHandler(wizards, camera.viewportHeight));
+		renderer.setSpriteBatch(batch);
 	}
 	
 	@Override

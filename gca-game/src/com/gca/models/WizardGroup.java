@@ -19,7 +19,7 @@ import com.gca.utils.Timeable;
 public class WizardGroup implements KeyCallback, Timeable{
 
 	
-	private final static int START_LIVES = 4;
+	private final static int START_LIVES = 1;
 	private final float MOVE_SPEED = 300f/GameScreen.PIX_PER_UNIT;
 	
 	private final List<Wizard> wizards;

@@ -1,12 +1,13 @@
 package com.gca;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.gca.screens.GameScreen;
 
 public class GCAGame extends Game {
 	
-	public static final float TARGET_RES_PIX = 700f;
+	public static float TARGET_RES_PIX = 700f;
 	
 	GameScreen gameScreen;
 	
@@ -15,7 +16,7 @@ public class GCAGame extends Game {
 	@Override
 	public void create() {
 		batch = new SpriteBatch();
-		gameScreen = new GameScreen(batch);
+		gameScreen = new GameScreen(batch, this);
 		setScreen(new MenuScreen(batch, this));
 	}
 
