@@ -18,7 +18,7 @@ public class Orc extends Character implements Timeable {
 	private static final int ARROW_DAMAGE = 1;
 	public static final float ORC_WIDTH = 75/GameScreen.PIX_PER_UNIT;
 	public static final float ORC_HEIGHT = 75/GameScreen.PIX_PER_UNIT;
-	public static final float MOVE_SPEED = 125f/GameScreen.PIX_PER_UNIT;
+	public static final float MOVE_SPEED = 250f/GameScreen.PIX_PER_UNIT;
 	
 	private static final Random RAND = new Random();
 	private final Rectangle hitBox;	

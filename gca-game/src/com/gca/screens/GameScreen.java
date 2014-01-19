@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Peripheral;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
@@ -41,10 +42,12 @@ public class GameScreen extends AbstractScreen {
 	private final List<Arrow> arrows;
 	private final List<Spell> spells;
 	private final List<Obstacle> obstacles;
-	private final WizardGroup wizards;
+	private WizardGroup wizards;
 	
 	private float timeSinceOrcSpawn = 0;
 	private float orcSpawnTime;
+	private float timeSinceObSpawn = 0;
+	private float obSpawnTime;
 	private final Random random;
 	
 	private Renderer renderer;
@@ -56,15 +59,24 @@ public class GameScreen extends AbstractScreen {
 		this.arrows = new LinkedList<Arrow>();
 		this.spells = new LinkedList<Spell>();
 		this.obstacles = new LinkedList<Obstacle>();
+		this.random = new Random(); 
+		this.deadOrcs = new LinkedList<Orc>();
+		this.orcSpawnTime = 2f; 
+		
+		float x = 0;
+		float y = 0;
+		
+		if (Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer)) {
+			x = Gdx.input.getAccelerometerX();
+			y = Gdx.input.getAccelerometerY();
+		}
 		this.wizards = new WizardGroup(VIEWPORT_WIDTH/2f, new WizardGroup.SpellCallback() {
 			@Override
 			public void useSpell(float x, float y) {
 				wizards.cast(x, y, spells);
 			}
-		});
-		this.random = new Random(); 
-		this.deadOrcs = new LinkedList<Orc>();
-		this.orcSpawnTime = 2f; 
+		}, x, y);
+		
 	}
 	
 	@Override
@@ -92,6 +104,12 @@ public class GameScreen extends AbstractScreen {
 			spawnOrc();
 		} else timeSinceOrcSpawn += delta;
 		
+		if (timeSinceObSpawn >= obSpawnTime) {
+			timeSinceObSpawn = 0;
+			obSpawnTime = random.nextInt(5) + 2;
+			spawnObstacle();
+		} else timeSinceObSpawn += delta;
+		
 		for (Orc orc: orcs) {
 			orc.addTime(delta);
 			if (orc.shootArrow()) {
@@ -103,6 +121,7 @@ public class GameScreen extends AbstractScreen {
 					float angle =  (float) Math.atan(random.nextDouble());
 					if (orc.position.x > VIEWPORT_WIDTH/2f) 
 						angle += MathUtils.PI;
+					orc.angle = angle;
 					Vector2 arrowVelocity = new Vector2(Arrow.VELOCITY * MathUtils.cos(angle), Arrow.VELOCITY * MathUtils.sin(angle));
 					float posX =  orc.position.x + Orc.ORC_WIDTH/2f - Arrow.ARROW_WIDTH/2f;
 					arrows.add(new Arrow(posX, orc.position.y + Orc.ORC_HEIGHT/2f - Arrow.ARROW_HEIGHT/2f + 0.15f, arrowVelocity, angle, orc.getDamage()));
@@ -133,11 +152,25 @@ public class GameScreen extends AbstractScreen {
 		Iterator<Orc> orcIt = deadOrcs.iterator();
 		while (orcIt.hasNext()) {
 			Orc orc = orcIt.next();
-			orc.move(0, -delta * renderer.SPEED);
+			orc.move(0, -delta * Renderer.SPEED);
 			orc.deadOpacity -= delta * 0.5f;
 			if (orc.deadOpacity < 0) orcIt.remove();
 		}
 		
+	}
+
+	
+	
+	private void spawnObstacle() {
+		float x = random.nextInt((int) (RIVER_SIZE - GRASS_BORDER_SIZE)) + 1.4f * GRASS_BORDER_SIZE ;
+		float y = camera.viewportHeight + 1f;
+		Obstacle ob;
+		if (random.nextDouble() < 0.3f) ob = new Obstacle(x, y, 1);
+		else if (random.nextDouble() < 0.5f) ob = new Obstacle(x, y, 2);
+		else if (random.nextDouble() < 0.7f) ob = new Obstacle(x, y, 3);
+		else if (random.nextDouble() < 0.9f) ob = new Obstacle(x, y, 4);
+		else  ob = new Obstacle(x, y, 5);
+		obstacles.add(ob);
 	}
 
 	@Override
@@ -155,6 +188,7 @@ public class GameScreen extends AbstractScreen {
 		renderer.orcs(orcs);
 		renderer.arrows(arrows);
 		renderer.spells(spells);
+		renderer.obstacles(obstacles);
 		batch.end();
 	}
 	
@@ -164,7 +198,7 @@ public class GameScreen extends AbstractScreen {
 		Orc newOrc;
 		if (random.nextDouble() < 0.1f) newOrc = new Orc.EliteOrc(x, y);
 		else newOrc = new Orc(x, y);
-		newOrc.setDestination(newOrc.position.x, random.nextFloat() * camera.viewportHeight * 0.8f);
+		newOrc.setDestination(newOrc.position.x, random.nextFloat() * camera.viewportHeight * 0.9f);
 		orcs.add(newOrc);
 	}
 	

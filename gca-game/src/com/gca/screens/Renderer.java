@@ -9,8 +9,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import com.gca.models.Obstacle;
 import com.gca.models.Orc;
 import com.gca.models.Wizard;
 import com.gca.models.WizardGroup;
@@ -38,9 +40,17 @@ public class Renderer {
 	private final TextureRegion arr;
 	private final TextureRegion spell;
 	
+	private final TextureRegion log;
+	private final TextureRegion fish;
+	private final TextureRegion rock;
+	private final TextureRegion shark;
+	private final TextureRegion octopus;
+	
 	private final TextureRegion sideBubble;
 	private final TextureRegion mainBubble;
 	private final TextureRegion moveBubble;
+	
+	ShapeRenderer s = new ShapeRenderer();
 	
 	private final Array<Sprite> orcWalk;
 	private static final float ORC_WALK_FPS = 4f;
@@ -66,7 +76,12 @@ public class Renderer {
 		orcWalk = main.createSprites("orcwalk");
 		orcShoot = main.createSprites("orcshoot");
 		arr = main.createSprite("arrow");
-		spell = new TextureRegion(arr);
+		spell = main.createSprite("fire");
+		log = main.createSprite("log");
+		fish = main.createSprite("fish");
+		rock = main.createSprite("rock");
+		shark = main.createSprite("shark");
+		octopus = main.createSprite("octopus");
 		arr.flip(true, false);
 		
 		cliffs = new float[15];
@@ -75,13 +90,13 @@ public class Renderer {
 			cliffs[i] = cliffWidth * i;
 		}
 		
+		sideBubble = main.createSprite("side bubble");
 		bubbles = new float[10];
-		float bubbleHeight = 200f/GameScreen.PIX_PER_UNIT;
+		float bubbleHeight = sideBubble.getRegionHeight()/GameScreen.PIX_PER_UNIT;
 		for (int i = 0; i < bubbles.length ; i++) {
 			bubbles[i] = bubbleHeight * i;
 		}
 		
-		sideBubble = main.createSprite("bubbles side");
 		mainBubble = main.createSprite("trail fwd");
 		moveBubble = main.createSprite("bubbles move side");
 		
@@ -122,8 +137,8 @@ public class Renderer {
 	}
 	
 	public void bubble(float delta, WizardGroup wg) {
-		float bubbleWidth = 62f/GameScreen.PIX_PER_UNIT;
-		float bubbleHeight = 200f/GameScreen.PIX_PER_UNIT;
+		float bubbleWidth = sideBubble.getRegionWidth()/GameScreen.PIX_PER_UNIT;
+		float bubbleHeight = sideBubble.getRegionHeight()/GameScreen.PIX_PER_UNIT;
 		for (int i = 0; i < bubbles.length; i++) {
 			
 			bubbles[i] -= delta * SPEED;
@@ -135,14 +150,13 @@ public class Renderer {
 			
 		}
 		for (Wizard w : wg.getWizards()) {
+			batch.draw(mainBubble, w.position.x - 0.08f, w.position.y - 1.3f, mainBubble.getRegionWidth()/GameScreen.PIX_PER_UNIT, mainBubble.getRegionHeight()/GameScreen.PIX_PER_UNIT);
 			if (w.direction == Wizard.STILL) {
 				batch.draw(mainBubble, w.position.x - 0.08f, w.position.y - 1.3f, mainBubble.getRegionWidth()/GameScreen.PIX_PER_UNIT, mainBubble.getRegionHeight()/GameScreen.PIX_PER_UNIT);
 			} else if (w.direction == Wizard.RIGHT) {
-				batch.draw(moveBubble, w.position.x - 1.2f, w.position.y - 1.5f, moveBubble.getRegionWidth()/GameScreen.PIX_PER_UNIT, moveBubble.getRegionHeight()/GameScreen.PIX_PER_UNIT);
+				batch.draw(mainBubble, w.position.x - 0.08f, w.position.y - 1.3f, mainBubble.getRegionWidth()/GameScreen.PIX_PER_UNIT, mainBubble.getRegionHeight()/GameScreen.PIX_PER_UNIT);
 			} else if (w.direction == Wizard.LEFT) {
-				moveBubble.flip(true, false);
-				batch.draw(moveBubble, w.position.x + 0.5f, w.position.y - 1.5f, moveBubble.getRegionWidth()/GameScreen.PIX_PER_UNIT, moveBubble.getRegionHeight()/GameScreen.PIX_PER_UNIT);
-				moveBubble.flip(true, false);
+				batch.draw(mainBubble, w.position.x - 0.08f, w.position.y - 1.3f, mainBubble.getRegionWidth()/GameScreen.PIX_PER_UNIT, mainBubble.getRegionHeight()/GameScreen.PIX_PER_UNIT);
 			}
 		}
 	}
@@ -151,10 +165,10 @@ public class Renderer {
 		for (Wizard w : wg.getWizards()) {
 			batch.draw(barrel, w.position.x, w.position.y, Wizard.SIZE, Wizard.SIZE);
 			if (!w.hurt) {
-				batch.draw(wizard, w.position.x, w.position.y, Wizard.WIZARD_WIDTH/2f + 0.05f, Wizard.WIZARD_HEIGHT/2f, Wizard.WIZARD_WIDTH, Wizard.WIZARD_HEIGHT, 1f, 1f, 270);
+				batch.draw(wizard, w.position.x, w.position.y, Wizard.WIZARD_WIDTH/2f + 0.05f, Wizard.WIZARD_HEIGHT/2f, Wizard.WIZARD_WIDTH, Wizard.WIZARD_HEIGHT, 1f, 1f, 0);
 			} else {
 				batch.setColor(1.0f, 1.0f, 1.0f, 0.5f);
-				batch.draw(wizard, w.position.x, w.position.y, Wizard.WIZARD_WIDTH/2f + 0.05f, Wizard.WIZARD_HEIGHT/2f, Wizard.WIZARD_WIDTH, Wizard.WIZARD_HEIGHT, 1f, 1f, 270);
+				batch.draw(wizard, w.position.x, w.position.y, Wizard.WIZARD_WIDTH/2f + 0.05f, Wizard.WIZARD_HEIGHT/2f, Wizard.WIZARD_WIDTH, Wizard.WIZARD_HEIGHT, 1f, 1f, 0);
 				batch.setColor(1.0f, 1.0f, 1.0f, 1f);
 			}
 		}
@@ -201,12 +215,41 @@ public class Renderer {
 		}
 	}
 	
-	public void spells(List<Spell> arrows) {
-		float arrWidth = arr.getRegionWidth()/GameScreen.PIX_PER_UNIT;
-		float arrHeight = arr.getRegionHeight()/GameScreen.PIX_PER_UNIT;
-		for (Spell arrow: arrows) {
-			batch.draw(arr, arrow.position.x, arrow.position.y, arrWidth/2f, arrHeight/2f, arrWidth, arrHeight, 
-					1f, 1f, arrow.angle / MathUtils.PI * 180f);
+	public void spells(List<Spell> spells) {
+		float arrWidth = spell.getRegionWidth()/GameScreen.PIX_PER_UNIT;
+		float arrHeight = spell.getRegionHeight()/GameScreen.PIX_PER_UNIT;
+		for (Spell spell: spells) {
+			batch.draw(this.spell, spell.position.x, spell.position.y, arrWidth/2f, arrHeight/2f, arrWidth, arrHeight, 
+					1f, 1f, spell.angle / MathUtils.PI * 180f - 90);
+		}
+	}
+
+	public void obstacles(List<Obstacle> obstacles) {
+		for (Obstacle ob : obstacles) {
+			if (ob.type == 1) {
+				batch.draw(log, ob.position.x, ob.position.y, Obstacle.LOG_WIDTH/2f, Obstacle.LOG_HEIGHT/2f, 
+						Obstacle.LOG_WIDTH, Obstacle.LOG_HEIGHT, 1f, 1f, 90);
+			} else if (ob.type == 2) {
+				batch.draw(fish, ob.position.x, ob.position.y, Obstacle.FISH_WIDTH/2f, Obstacle.FISH_HEIGHT/2f, 
+						Obstacle.FISH_WIDTH, Obstacle.FISH_HEIGHT, 1f, 1f, 0);
+			} else if (ob.type == 3) {
+				batch.draw(rock, ob.position.x, ob.position.y, Obstacle.ROCK_WIDTH/2f, Obstacle.ROCK_HEIGHT/2f, 
+						Obstacle.ROCK_WIDTH, Obstacle.ROCK_HEIGHT, 1f, 1f, 65);
+			} else if (ob.type == 4) {
+				batch.draw(shark, ob.position.x, ob.position.y, Obstacle.SHARK_WIDTH/2f, Obstacle.SHARK_HEIGHT/2f, 
+						Obstacle.SHARK_WIDTH, Obstacle.SHARK_HEIGHT, 1f, 1f, 270);
+			} else if (ob.type == 5) {
+				batch.draw(octopus, ob.position.x, ob.position.y, Obstacle.OCTOPUS_WIDTH/2f, Obstacle.OCTOPUS_HEIGHT/2f, 
+						Obstacle.OCTOPUS_WIDTH, Obstacle.OCTOPUS_HEIGHT, 1f, 1f, 270);
+			}  
+		}
+		for (Obstacle ob : obstacles) {
+			batch.end();
+			s.begin(ShapeType.Filled);
+			s.setColor(1f, 1f, 1f, 1f);
+			s.rect(ob.position.x, ob.position.y, ob.getHitBox().width, ob.getHitBox().height);
+			s.end();
+			batch.begin();
 		}
 	}
 	

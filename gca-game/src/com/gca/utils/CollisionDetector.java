@@ -30,16 +30,11 @@ public class CollisionDetector {
 	}
 	
 	public static final boolean orcHit(Orc o, Spell s) {
-		Rectangle owb = o.getHitBox();
-		return owb.contains(s.ls.p1) || owb.contains(s.ls.p2);		
+		return Intersector.overlaps(o.getHitBox(), s.getHitBox());
 	}
 	
 	public static boolean wizardHit (Wizard w, Obstacle o) {
 		return Intersector.overlaps(w.getHitBox(), o.getHitBox());
-	}
- 
-	public static final boolean orcHit() {
-		return false;
 	}
 	
 }

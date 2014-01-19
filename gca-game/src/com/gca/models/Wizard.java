@@ -22,12 +22,15 @@ public class Wizard extends Character implements Timeable {
 	
 	public float responseThreshold;
 	
+	float bottomY;
+	float topY;
+	
 	public final static int STILL = 0x000;
 	public final static int LEFT = 0x001;
 	public final static int RIGHT = 0x002;
 	public int direction;
 	
-	public Wizard(float x, float y, float width, float height, float response) {
+	public Wizard(float x, float y, float width, float height, float response, float bottomY, float topY) {
 		super(x, y, HEALTH);
 		hitBox = new Circle();
 		hitBox.radius = RADIUS;
@@ -35,6 +38,8 @@ public class Wizard extends Character implements Timeable {
 		hurtTimer = DAMAGE_RESET;
 		responseThreshold = response;
 		direction = STILL;
+		this.bottomY = bottomY;
+		this.topY = topY;
 	}
 	
 	public Circle getHitBox() {

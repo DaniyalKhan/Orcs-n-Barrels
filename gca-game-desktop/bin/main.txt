@@ -2,108 +2,332 @@ main.png
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
-barrel
+orcshoot
   rotate: false
-  xy: 342, 104
-  size: 100, 100
-  orig: 100, 100
-  offset: 0, 0
+  xy: 402, 122
+  size: 76, 110
+  orig: 150, 150
+  offset: 37, 33
+  index: 2
+2plus
+  rotate: false
+  xy: 249, 962
+  size: 61, 55
+  orig: 105, 85
+  offset: 20, 18
   index: -1
- orcshoot
+0
   rotate: false
-  xy: 187, 226
+  xy: 84, 964
+  size: 43, 58
+  orig: 315, 132
+  offset: 168, 33
+  index: -1
+7
+  rotate: true
+  xy: 440, 904
+  size: 39, 62
+  orig: 315, 132
+  offset: 167, 41
+  index: -1
+orcshoot
+  rotate: false
+  xy: 436, 2
   size: 76, 110
   orig: 150, 150
   offset: 37, 33
   index: 1
-orcshoot
-  rotate: false
-  xy: 186, 114
-  size: 76, 110
-  orig: 150, 150
-  offset: 37, 33
-  index: 4
-orcshoot
-  rotate: false
-  xy: 264, 114
-  size: 76, 110
-  orig: 150, 150
-  offset: 38, 33
-  index: 3
-bubbles side
-  rotate: false
-  xy: 2, 237
-  size: 62, 200
-  orig: 100, 200
-  offset: 38, 0
-  index: -1
-trail fwd
-  rotate: false
-  xy: 66, 237
-  size: 119, 191
-  orig: 119, 191
-  offset: 0, 0
-  index: -1
-wizard
-  rotate: true
-  xy: 104, 430
-  size: 80, 88
-  orig: 100, 100
-  offset: 11, 0
-  index: -1
-water
-  rotate: false
-  xy: 266, 2
-  size: 100, 100
-  orig: 100, 100
-  offset: 0, 0
-  index: -1
-grass
-  rotate: false
-  xy: 265, 226
-  size: 100, 100
-  orig: 100, 100
-  offset: 0, 0
-  index: -1
-orcshoot
-  rotate: false
-  xy: 186, 2
-  size: 78, 110
-  orig: 150, 150
-  offset: 35, 33
-  index: 2
 orcwalk
   rotate: true
-  xy: 187, 338
+  xy: 261, 520
   size: 88, 84
   orig: 150, 150
   offset: 25, 24
   index: -1
+highscore
+  rotate: true
+  xy: 2, 719
+  size: 295, 80
+  orig: 315, 132
+  offset: 7, 26
+  index: -1
+poison
+  rotate: true
+  xy: 293, 237
+  size: 122, 76
+  orig: 122, 76
+  offset: 0, 0
+  index: -1
 arrow
   rotate: true
-  xy: 2, 463
+  xy: 293, 361
   size: 19, 74
   orig: 55, 94
   offset: 15, 8
   index: -1
+bubbles side
+  rotate: false
+  xy: 194, 715
+  size: 62, 200
+  orig: 100, 200
+  offset: 38, 0
+  index: -1
+1
+  rotate: false
+  xy: 170, 964
+  size: 25, 56
+  orig: 315, 132
+  offset: 148, 39
+  index: -1
+barrel
+  rotate: false
+  xy: 449, 234
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+ice
+  rotate: true
+  xy: 2, 402
+  size: 315, 132
+  orig: 315, 132
+  offset: 0, 0
+  index: -1
+8
+  rotate: false
+  xy: 357, 959
+  size: 41, 62
+  orig: 315, 132
+  offset: 169, 25
+  index: -1
+shadow
+  rotate: false
+  xy: 379, 877
+  size: 66, 25
+  orig: 196, 205
+  offset: 62, 94
+  index: -1
+start
+  rotate: true
+  xy: 219, 237
+  size: 153, 72
+  orig: 315, 132
+  offset: 87, 31
+  index: -1
 orcwalk
   rotate: true
-  xy: 368, 2
+  xy: 347, 520
   size: 88, 84
   orig: 150, 150
   offset: 27, 24
   index: -1
-bubbles move side
+orcshoot
+  rotate: false
+  xy: 322, 122
+  size: 78, 110
+  orig: 150, 150
+  offset: 35, 33
+  index: 4
+wizard
+  rotate: false
+  xy: 480, 114
+  size: 80, 88
+  orig: 100, 100
+  offset: 11, 0
+  index: -1
+2
+  rotate: true
+  xy: 194, 917
+  size: 43, 64
+  orig: 315, 132
+  offset: 119, 20
+  index: -1
+rock
+  rotate: true
+  xy: 66, 243
+  size: 154, 151
+  orig: 272, 165
+  offset: 55, 8
+  index: -1
+3plus
+  rotate: false
+  xy: 260, 906
+  size: 61, 51
+  orig: 105, 85
+  offset: 22, 17
+  index: -1
+statbar
+  rotate: true
+  xy: 400, 949
+  size: 70, 76
+  orig: 200, 200
+  offset: 62, 65
+  index: -1
+trail fwd
+  rotate: false
+  xy: 258, 713
+  size: 119, 191
+  orig: 119, 191
+  offset: 0, 0
+  index: -1
+fish
+  rotate: false
+  xy: 478, 945
+  size: 110, 77
+  orig: 272, 165
+  offset: 80, 29
+  index: -1
+tutorial arrow
+  rotate: false
+  xy: 379, 713
+  size: 128, 162
+  orig: 200, 200
+  offset: 25, 21
+  index: -1
+orcshoot
+  rotate: false
+  xy: 371, 234
+  size: 76, 110
+  orig: 150, 150
+  offset: 38, 33
+  index: 3
+side bubble
   rotate: false
   xy: 2, 2
-  size: 182, 233
-  orig: 182, 233
+  size: 62, 398
+  orig: 62, 398
   offset: 0, 0
   index: -1
 cliff tile
   rotate: true
-  xy: 2, 439
+  xy: 447, 877
   size: 22, 100
   orig: 22, 100
   offset: 0, 0
+  index: -1
+shark
+  rotate: true
+  xy: 136, 621
+  size: 92, 109
+  orig: 272, 165
+  offset: 93, 24
+  index: -1
+menuselect
+  rotate: false
+  xy: 197, 962
+  size: 50, 60
+  orig: 200, 200
+  offset: 76, 73
+  index: -1
+cooldown fill
+  rotate: true
+  xy: 20, 1016
+  size: 4, 16
+  orig: 200, 200
+  offset: 87, 121
+  index: -1
+3
+  rotate: false
+  xy: 312, 959
+  size: 43, 62
+  orig: 315, 132
+  offset: 140, 35
+  index: -1
+tutorial
+  rotate: true
+  xy: 66, 2
+  size: 239, 70
+  orig: 315, 132
+  offset: 34, 26
+  index: -1
+9
+  rotate: false
+  xy: 129, 964
+  size: 39, 58
+  orig: 315, 132
+  offset: 148, 53
+  index: -1
+octopus
+  rotate: true
+  xy: 136, 399
+  size: 220, 123
+  orig: 272, 165
+  offset: 30, 18
+  index: -1
+fire
+  rotate: false
+  xy: 84, 719
+  size: 108, 243
+  orig: 108, 243
+  offset: 0, 0
+  index: -1
+1plus
+  rotate: false
+  xy: 323, 906
+  size: 51, 51
+  orig: 105, 85
+  offset: 22, 20
+  index: -1
+kills
+  rotate: false
+  xy: 247, 621
+  size: 145, 90
+  orig: 315, 132
+  offset: 85, 15
+  index: -1
+water
+  rotate: false
+  xy: 394, 610
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+hp fill
+  rotate: true
+  xy: 2, 1016
+  size: 4, 16
+  orig: 200, 200
+  offset: 66, 122
+  index: -1
+grass
+  rotate: false
+  xy: 388, 346
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+bubbles move side
+  rotate: false
+  xy: 138, 2
+  size: 182, 233
+  orig: 182, 233
+  offset: 0, 0
+  index: -1
+5
+  rotate: true
+  xy: 376, 906
+  size: 41, 62
+  orig: 315, 132
+  offset: 138, 52
+  index: -1
+barreltop
+  rotate: false
+  xy: 322, 2
+  size: 112, 118
+  orig: 200, 200
+  offset: 45, 41
+  index: -1
+log
+  rotate: true
+  xy: 261, 392
+  size: 126, 125
+  orig: 272, 165
+  offset: 71, 27
+  index: -1
+6
+  rotate: true
+  xy: 504, 901
+  size: 39, 62
+  orig: 315, 132
+  offset: 129, 40
   index: -1
