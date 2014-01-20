@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
+import com.gca.models.Life;
 import com.gca.models.Obstacle;
 import com.gca.models.Orc;
 import com.gca.models.Wizard;
@@ -21,7 +22,7 @@ import com.gca.models.projectiles.Spell;
 public class Renderer {
 
 	public static float SPEED = 500f/GameScreen.PIX_PER_UNIT;
-		
+			
 	private final float width;
 	private final float height;
 	
@@ -29,6 +30,12 @@ public class Renderer {
 	public final Texture main2;
 	
 	private final Texture background;
+	
+	private  Texture attacks;
+
+	private  TextureRegion ice;
+	private  TextureRegion poison;
+	private  TextureRegion fire;
 	
 	private final TextureRegion cliff;
 	private final TextureRegion water;
@@ -39,6 +46,8 @@ public class Renderer {
 	
 	private final TextureRegion arr;
 	private final TextureRegion spell;
+	private final TextureRegion spell2;
+	private final TextureRegion spell3;
 	
 	private final TextureRegion shadow;
 	
@@ -53,10 +62,6 @@ public class Renderer {
 	private final TextureRegion sideBubble;
 	private final TextureRegion mainBubble;
 	private final TextureRegion moveBubble;
-	
-	private final TextureRegion sp1;
-	private final TextureRegion sp2;
-	private final TextureRegion sp3;
 
 	private final TextureRegion text1;
 	private final TextureRegion text2;
@@ -81,6 +86,10 @@ public class Renderer {
 
 	private TextureRegion noT;
 	
+	private TextureRegion bar;
+	private TextureRegion hpfill;
+	private TextureRegion cdfill;
+	
 	public Renderer(float width, float height) {
 		this.width = width;
 		this.height = height;
@@ -90,6 +99,9 @@ public class Renderer {
 		
 		cliff = main.createSprite("cliff tile");
 		background = new Texture("background.png");
+
+		attacks = new Texture(Gdx.files.internal("select.png"));
+		
 		grass = new TextureRegion(background, 1, 1, 100, 100);
 		water = new TextureRegion(background, 1, 101, 100, 100);
 		barrel = main.createSprite("barrel");
@@ -99,16 +111,16 @@ public class Renderer {
 		arr = main.createSprite("arrow");
 		arr.flip(true, false);
 		spell = main.createSprite("fire");
+		spell2 = main.createSprite("ice");
+		spell3 = main.createSprite("poison");
+		
 		log = main.createSprite("log");
 		fish = main.createSprite("fish");
 		rock = main.createSprite("rock");
 		shark = main.createSprite("shark");
 		octopus = main.createSprite("octopus");
 		shadow = main.createSprite("shadow");
-		lid = main.createSprite("barrel top");
-		sp1 = new TextureRegion(main2, 296, 676, 180, 150);
-		sp2 = new TextureRegion(main2, 750, 722, 180, 150);
-		sp3 = new TextureRegion(main2, 2, 870, 160, 150);
+		lid = main.createSprite("barreltop");
 		
 		text1 = main.createSprite("1");
 		text2 = main.createSprite("2");
@@ -119,6 +131,17 @@ public class Renderer {
 		yesT = new TextureRegion(main2, 521, 491, 66, 120);
 		noT = new TextureRegion(main2, 325, 918, 96, 75);
 
+		poison = new TextureRegion(attacks, 2, 304, 150, 150);
+		fire = new TextureRegion(attacks, 2, 2, 150, 150);
+		ice = new TextureRegion(attacks, 2, 152, 160, 150);
+		
+		bar = new TextureRegion(main2, 886, 1014, 110, 20);
+		hpfill = new TextureRegion(main2, 984, 66, 6, 2);
+		hpfill.flip(false, true);
+		
+		cdfill = new TextureRegion(main2, 1016, 70, 6, 2);
+		cdfill.flip(false, true);
+		
 		cliffs = new float[15];
 		float cliffWidth = 100f/GameScreen.PIX_PER_UNIT;
 		for (int i = 0; i < cliffs.length ; i++) {
@@ -231,6 +254,18 @@ public class Renderer {
 				batch.draw(wizard, w.position.x, w.position.y, Wizard.WIZARD_WIDTH/2f + 0.05f, Wizard.WIZARD_HEIGHT/2f, Wizard.WIZARD_WIDTH, Wizard.WIZARD_HEIGHT, 1f, 1f, 0);
 				batch.setColor(1.0f, 1.0f, 1.0f, 1f);
 			}
+						
+			batch.draw(bar, w.position.x+ (Wizard.SIZE - bar.getRegionWidth()/GameScreen.PIX_PER_UNIT)/2f , w.position.y + Wizard.SIZE , bar.getRegionWidth()/GameScreen.PIX_PER_UNIT, bar.getRegionHeight()/GameScreen.PIX_PER_UNIT);
+			
+			int barsPerHealth = 45;
+			float begX = 7f/GameScreen.PIX_PER_UNIT + w.position.x+ (Wizard.SIZE - bar.getRegionWidth()/GameScreen.PIX_PER_UNIT)/2f;
+			for (int i = 0; i < barsPerHealth * w.health/((float)Wizard.HEALTH); i ++) {
+				for (int j = 0; j < 4; j++) {
+					batch.draw(hpfill, begX, w.position.y + Wizard.SIZE + 0.075f, hpfill.getRegionWidth()/GameScreen.PIX_PER_UNIT/2f, hpfill.getRegionHeight()/GameScreen.PIX_PER_UNIT/2f,  
+						hpfill.getRegionWidth()/GameScreen.PIX_PER_UNIT, (hpfill.getRegionHeight() +4f)/GameScreen.PIX_PER_UNIT, 1f, 1f, 270);
+					begX += 0.5f/GameScreen.PIX_PER_UNIT;
+				}
+			}
 		}
 	}
 	
@@ -248,14 +283,53 @@ public class Renderer {
 		}
 	}
 	
-	public void spells() {
-		batch.end();
-//		GLCommon gl = Gdx.gl;
-//		gl.glActiveTexture(GL20.GL_TEXTURE0);
-		batch.begin();
-		batch.draw(sp1, 1f, 0f, sp1.getRegionWidth()/GameScreen.PIX_PER_UNIT, sp1.getRegionHeight()/GameScreen.PIX_PER_UNIT);
-//		batch.draw(sp2, 2.5f, 0f, sp2.getRegionWidth()/GameScreen.PIX_PER_UNIT, sp2.getRegionHeight()/GameScreen.PIX_PER_UNIT);
-//		batch.draw(sp3, 4f, 0f, sp3.getRegionWidth()/GameScreen.PIX_PER_UNIT, sp3.getRegionHeight()/GameScreen.PIX_PER_UNIT);
+	public void spells(WizardGroup w) {
+		
+		batch.draw(ice, 0.8f, 0f, ice.getRegionWidth()/GameScreen.PIX_PER_UNIT, ice.getRegionHeight()/GameScreen.PIX_PER_UNIT);
+		batch.draw(fire, 2.35f, 0f, fire.getRegionWidth()/GameScreen.PIX_PER_UNIT, fire.getRegionHeight()/GameScreen.PIX_PER_UNIT);
+		batch.draw(poison, 3.8f, 0f, poison.getRegionWidth()/GameScreen.PIX_PER_UNIT, poison.getRegionHeight()/GameScreen.PIX_PER_UNIT);
+				
+		float width = ice.getRegionWidth()/GameScreen.PIX_PER_UNIT;
+
+		batch.draw(bar, 0.8f + (width - bar.getRegionWidth()/GameScreen.PIX_PER_UNIT)/2f +0.08f , 0.2f - 0.075f , 
+				bar.getRegionWidth()/GameScreen.PIX_PER_UNIT, bar.getRegionHeight()/GameScreen.PIX_PER_UNIT);
+		int barsPerHealth = 45;
+		float begX = 7f/GameScreen.PIX_PER_UNIT + 0.8f + (width - bar.getRegionWidth()/GameScreen.PIX_PER_UNIT)/2f +0.08f;
+		for (int i = 0; i < barsPerHealth * w.numSpells[2]/(10f); i ++) {
+			for (int j = 0; j < 4; j++) {
+				batch.draw(cdfill, begX,  0.2f, cdfill.getRegionWidth()/GameScreen.PIX_PER_UNIT/2f, cdfill.getRegionHeight()/GameScreen.PIX_PER_UNIT/2f,  
+						cdfill.getRegionWidth()/GameScreen.PIX_PER_UNIT, (cdfill.getRegionHeight() +4f)/GameScreen.PIX_PER_UNIT, 1f, 1f, 270);
+				begX += 0.5f/GameScreen.PIX_PER_UNIT;
+			}
+		}
+		
+		width = fire.getRegionWidth()/GameScreen.PIX_PER_UNIT;
+
+		batch.draw(bar, 2.35f + (width - bar.getRegionWidth()/GameScreen.PIX_PER_UNIT)/2f +0.03f , 0.2f - 0.075f , 
+				bar.getRegionWidth()/GameScreen.PIX_PER_UNIT, bar.getRegionHeight()/GameScreen.PIX_PER_UNIT);
+		begX = 7f/GameScreen.PIX_PER_UNIT + 2.35f + (width - bar.getRegionWidth()/GameScreen.PIX_PER_UNIT)/2f +0.03f ;
+		for (int i = 0; i < barsPerHealth * w.numSpells[1]/(10f); i ++) {
+			for (int j = 0; j < 4; j++) {
+				batch.draw(cdfill, begX,  0.2f, cdfill.getRegionWidth()/GameScreen.PIX_PER_UNIT/2f, cdfill.getRegionHeight()/GameScreen.PIX_PER_UNIT/2f,  
+						cdfill.getRegionWidth()/GameScreen.PIX_PER_UNIT, (cdfill.getRegionHeight() +4f)/GameScreen.PIX_PER_UNIT, 1f, 1f, 270);
+				begX += 0.5f/GameScreen.PIX_PER_UNIT;
+			}
+		}
+		
+		width = poison.getRegionWidth()/GameScreen.PIX_PER_UNIT;
+
+		batch.draw(bar, 3.8f + (width - bar.getRegionWidth()/GameScreen.PIX_PER_UNIT)/2f +0.03f , 0.2f - 0.075f , 
+				bar.getRegionWidth()/GameScreen.PIX_PER_UNIT, bar.getRegionHeight()/GameScreen.PIX_PER_UNIT);
+		begX = 7f/GameScreen.PIX_PER_UNIT +3.8f + (width - bar.getRegionWidth()/GameScreen.PIX_PER_UNIT)/2f +0.03f ;
+		for (int i = 0; i < barsPerHealth * w.numSpells[3]/(10f); i ++) {
+			for (int j = 0; j < 4; j++) {
+				batch.draw(cdfill, begX,  0.2f, cdfill.getRegionWidth()/GameScreen.PIX_PER_UNIT/2f, cdfill.getRegionHeight()/GameScreen.PIX_PER_UNIT/2f,  
+						cdfill.getRegionWidth()/GameScreen.PIX_PER_UNIT, (cdfill.getRegionHeight() +4f)/GameScreen.PIX_PER_UNIT, 1f, 1f, 270);
+				begX += 0.5f/GameScreen.PIX_PER_UNIT;
+			}
+		}
+		
+
 	}
 	
 	public void orcs(List<Orc> orcs) {
@@ -306,10 +380,14 @@ public class Renderer {
 	}
 	
 	public void spells(List<Spell> spells) {
-		float arrWidth = spell.getRegionWidth()/GameScreen.PIX_PER_UNIT;
-		float arrHeight = spell.getRegionHeight()/GameScreen.PIX_PER_UNIT;
+		float sWidth = spell.getRegionWidth()/GameScreen.PIX_PER_UNIT;
+		float sHeight = spell.getRegionHeight()/GameScreen.PIX_PER_UNIT;
 		for (Spell spell: spells) {
-			batch.draw(this.spell, spell.position.x, spell.position.y, arrWidth/2f, arrHeight/2f, arrWidth, arrHeight, 
+			TextureRegion s;
+			if (spell.type == 1) s = this.spell;
+			else if (spell.type == 2) s = spell2;
+			else s = spell3;
+			batch.draw(s, spell.position.x, spell.position.y, sWidth/2f, sHeight/2f, sWidth, sHeight, 
 					1f, 1f, spell.angle / MathUtils.PI * 180f - 90);
 		}
 	}
@@ -335,14 +413,13 @@ public class Renderer {
 			}  
 			batch.setColor(1.0f, 1.0f, 1.0f, 1f);
 		}
-//		for (Obstacle ob : obstacles) {
-//			batch.end();
-//			s.begin(ShapeType.Filled);
-//			s.setColor(1f, 1f, 1f, 1f);
-//			s.rect(ob.position.x, ob.position.y, ob.getHitBox().width, ob.getHitBox().height);
-//			s.end();
-//			batch.begin();
-//		}
+	}
+	
+	public void life(Life l) {
+		batch.draw(barrel, l.position.x, l.position.y, Wizard.SIZE, Wizard.SIZE);
+		batch.setColor(1.0f, 1.0f, 1.0f, l.op);
+		batch.draw(lid, l.position.x, l.position.y, Wizard.SIZE, Wizard.SIZE);
+		batch.setColor(1.0f, 1.0f, 1.0f, 1f);
 	}
 
 	public void timer(float timer) {

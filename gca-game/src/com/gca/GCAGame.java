@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.gca.screens.GameScreen;
+import com.gca.utils.SoundPlayer;
 
 public class GCAGame extends Game {
 	

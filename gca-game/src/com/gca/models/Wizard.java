@@ -3,16 +3,17 @@ package com.gca.models;
 import com.badlogic.gdx.math.Circle;
 import com.gca.models.projectiles.Projectile;
 import com.gca.screens.GameScreen;
+import com.gca.utils.SoundPlayer;
 import com.gca.utils.Timeable;
 
 public class Wizard extends Character implements Timeable {
 
-	private static final int HEALTH = 1; //5
+	public static final int HEALTH = 5; //5
 	public static final float SIZE = 100f/GameScreen.PIX_PER_UNIT;
 	public static final float WIZARD_WIDTH = 88f/GameScreen.PIX_PER_UNIT;
 	public static final float WIZARD_HEIGHT = 80f/GameScreen.PIX_PER_UNIT;
 	
-	private static final float RADIUS = (float) (Math.sqrt(2) * SIZE)/2f;
+	public static final float RADIUS = (float) (Math.sqrt(2) * SIZE)/2f;
 	private static final float DAMAGE_RESET = 2.5f; //2.5
 	
 	private final Circle hitBox;
@@ -30,7 +31,10 @@ public class Wizard extends Character implements Timeable {
 	public final static int STILL = 0x000;
 	public final static int LEFT = 0x001;
 	public final static int RIGHT = 0x002;
+	public final static int UP = 0x003;
+	public final static int DOWN = 0x004;
 	public int direction;
+	public int direction2;
 	
 	public Wizard(float x, float y, float width, float height, float response, float bottomY, float topY) {
 		super(x, y, HEALTH);
@@ -65,6 +69,7 @@ public class Wizard extends Character implements Timeable {
 	
 	private void startHurtTimer() {
 		hurt = true;
+		SoundPlayer.wizardHit();
 		hurtTimer = 0;
 	}
 

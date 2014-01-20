@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Peripheral;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -15,6 +14,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.gca.GCAGame;
 import com.gca.MenuScreen;
+import com.gca.models.Life;
 import com.gca.models.Obstacle;
 import com.gca.models.Orc;
 import com.gca.models.Orc.EliteOrc;
@@ -57,11 +57,15 @@ public class GameScreen extends AbstractScreen {
 	private float obSpawnTime;
 	private final Random random;
 	
+	private float regenTimer = 0f;
+	
 	protected Renderer renderer;
 	
 	boolean gameOver;
 	
 	GCAGame game;
+	
+	public Life life;
 	
 	public GameScreen(SpriteBatch batch, GCAGame game) {
 		super(batch);
@@ -77,20 +81,7 @@ public class GameScreen extends AbstractScreen {
 		this.deadObs = new LinkedList<Obstacle>();
 		this.gameOver = false;
 		this.game = game;
-		this.timer = 1f; 
-		float x = 0;
-		float y = 0;
-		
-		if (Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer)) {
-			x = Gdx.input.getAccelerometerX();
-			y = Gdx.input.getAccelerometerY();
-		}
-		this.wizards = new WizardGroup(VIEWPORT_WIDTH/2f, new WizardGroup.SpellCallback() {
-			@Override
-			public void useSpell(float x, float y) {
-				wizards.cast(x, y, spells);
-			}
-		}, x, y);
+		this.timer = 1.5f; 
 		
 	}
 	
@@ -132,8 +123,12 @@ public class GameScreen extends AbstractScreen {
 	}
 	
 	public void logic(float delta) {
+		
+//		if (wizards.size() == 0 && life == null || wizards.size() == 0 && life != null && notInBounds(life.position)) {
+		
 		wizards.addTime(delta);
 		
+		regenTimer += delta;
 		Iterator<Spell> spellIt = spells.iterator();
 		while (spellIt.hasNext()) {
 			Spell spell = spellIt.next();
@@ -146,13 +141,13 @@ public class GameScreen extends AbstractScreen {
 		
 		if (timeSinceOrcSpawn >= orcSpawnTime) {
 			timeSinceOrcSpawn = 0;
-			orcSpawnTime = random.nextFloat() + 1;
+			orcSpawnTime = random.nextFloat() + 0.5f;
 			spawnOrc();
 		} else timeSinceOrcSpawn += delta;
 		
 		if (timeSinceObSpawn >= obSpawnTime) {
 			timeSinceObSpawn = 0;
-			obSpawnTime = random.nextInt(5) + 2;
+			obSpawnTime = random.nextInt(3) + 2;
 			spawnObstacle();
 		} else timeSinceObSpawn += delta;
 		
@@ -199,7 +194,7 @@ public class GameScreen extends AbstractScreen {
 		    	}
 		    }
 		}
-	
+		
 		if (wizards.size() == 0) {
 			gameOver = true;
 			Gdx.input.setInputProcessor(new InputAdapter() {
@@ -218,6 +213,7 @@ public class GameScreen extends AbstractScreen {
 				}
 			});
 		}
+	
 	}
 
 	
@@ -255,11 +251,14 @@ public class GameScreen extends AbstractScreen {
 		renderer.orcs(deadOrcs);
 		renderer.orcs(orcs);
 		renderer.wizards(deadWizards);
+		if (life != null) {
+			renderer.life(life);
+		}
 		renderer.wizards(wizards);
 		renderer.arrows(arrows);
 		renderer.spells(spells);
 		if (!(this instanceof MenuScreen)) {
-			renderer.spells();
+			renderer.spells(wizards);
 		}
 		if (gameOver) {
 			renderer.gameOver();
@@ -325,8 +324,14 @@ public class GameScreen extends AbstractScreen {
 		camera.setToOrtho(false, VIEWPORT_WIDTH, aspectRatio * VIEWPORT_WIDTH);
 		renderer = new Renderer(VIEWPORT_WIDTH, camera.viewportHeight);
 		Renderer.SPEED = 500f/PIX_PER_UNIT;
-		Gdx.input.setInputProcessor(new KeyHandler(wizards, camera.viewportHeight));
 		renderer.setSpriteBatch(batch);
+		this.wizards = new WizardGroup(VIEWPORT_WIDTH/2f, new WizardGroup.SpellCallback() {
+			@Override
+			public void useSpell(float x, float y) {
+				wizards.cast(x, y, spells);
+			}
+		}, camera.viewportHeight);
+		Gdx.input.setInputProcessor(new KeyHandler(wizards, camera.viewportHeight));
 	}
 	
 	@Override
