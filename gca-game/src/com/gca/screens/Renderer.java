@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -21,6 +22,7 @@ import com.gca.models.projectiles.Spell;
 
 public class Renderer {
 
+	
 	public static float SPEED = 500f/GameScreen.PIX_PER_UNIT;
 			
 	private final float width;

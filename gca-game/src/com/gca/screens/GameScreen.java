@@ -9,6 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -27,7 +28,10 @@ import com.gca.utils.KeyHandler;
 
 public class GameScreen extends AbstractScreen {
 	
+	
 	float timer;
+	
+	int kills = 0;
 	
 	public static final float VIEWPORT_WIDTH = 6f;
 	public static final float PIX_PER_UNIT = GCAGame.TARGET_RES_PIX/VIEWPORT_WIDTH;
@@ -64,6 +68,8 @@ public class GameScreen extends AbstractScreen {
 	boolean gameOver;
 	
 	GCAGame game;
+	
+	float totalTime = 0;
 	
 	public Life life;
 	
@@ -125,7 +131,7 @@ public class GameScreen extends AbstractScreen {
 	public void logic(float delta) {
 		
 //		if (wizards.size() == 0 && life == null || wizards.size() == 0 && life != null && notInBounds(life.position)) {
-		
+		totalTime += delta;
 		wizards.addTime(delta);
 		
 		regenTimer += delta;
@@ -141,7 +147,7 @@ public class GameScreen extends AbstractScreen {
 		
 		if (timeSinceOrcSpawn >= orcSpawnTime) {
 			timeSinceOrcSpawn = 0;
-			orcSpawnTime = random.nextFloat() + 0.5f;
+			orcSpawnTime = (float) (Math.pow(0.95, (double)totalTime) + 1f);
 			spawnOrc();
 		} else timeSinceOrcSpawn += delta;
 		
